@@ -4,8 +4,8 @@ import java.util.UUID
 
 class Task(
     priority: Priority,
-    val type: Type = Type.Basic,
-    val name: String = UUID.randomUUID().toString()
+    val name: String = UUID.randomUUID().toString(),
+    val type: Type = Type.Basic
 ) : Runnable {
     var _priority: Priority = priority
         private set
