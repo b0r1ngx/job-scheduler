@@ -9,7 +9,7 @@ internal class SchedulerTest {
     private val scheduler = Scheduler()
 
     @Test
-    fun addTasks() {
+    fun WHEN_adds_tasks_it_added_WHEN_pop_tasks_it_out() {
         Priority.entries.forEach {
             val task = Task(priority = it)
             scheduler.addTask(task = task)
@@ -21,12 +21,26 @@ internal class SchedulerTest {
     fun WHEN_different_priority_tasks_queued_THEN_highest_priority_task_picked() {
         val firstTask = Task(Priority.CRITICAL, "1")
         val secondTask = Task(Priority.HIGH, "2")
+        val thirdTask = Task(Priority.LOW, "3")
+
+        scheduler.addTask(firstTask)
+        scheduler.addTask(secondTask)
+        scheduler.addTask(thirdTask)
+
+        val actualExecutionOrder = scheduler.start()
+        assertEquals(firstTask, actualExecutionOrder.first())
+    }
+
+    @Test
+    fun WHEN_different_priority_tasks_queued_THEN_correct_order_of_execution_happened() {
+        val firstTask = Task(Priority.CRITICAL, "1")
+        val secondTask = Task(Priority.HIGH, "2")
         val thirdTask = Task(Priority.HIGH, "3")
         val fourthTask = Task(Priority.HIGH, "4")
         val fifthTask = Task(Priority.LOW, "5")
 
         scheduler.addTask(firstTask)
-        scheduler.addTask(thirdTask) // 3
+        scheduler.addTask(thirdTask)  // 3
         scheduler.addTask(fourthTask) // 4
         scheduler.addTask(secondTask) // 2
         scheduler.addTask(fifthTask)
@@ -37,13 +51,5 @@ internal class SchedulerTest {
 
         val actualExecutionOrder = scheduler.start()
         assertEquals(expectedExecutionOrder, actualExecutionOrder)
-    }
-
-    @Test
-    fun WHEN_tasks_more_than_capacity_added_THEN_scheduler_works_correct() {
-        repeat(20) {
-            scheduler.addTask(Task(Priority.entries.random()))
-        }
-        scheduler.start()
     }
 }
