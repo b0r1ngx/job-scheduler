@@ -3,6 +3,7 @@ import model.Scheduler
 import model.task.Task
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @Suppress("TestFunctionName")
 internal class SchedulerTest {
@@ -14,7 +15,7 @@ internal class SchedulerTest {
         Priority.entries.forEach {
             val task = Task(priority = it)
             scheduler.addTask(task = task)
-            assertEquals(task, scheduler.queue.poll())
+            assertEquals(task, scheduler.queue.pop())
         }
     }
 
@@ -44,7 +45,7 @@ internal class SchedulerTest {
             println(it.name)
         }
 
-        assertEquals(expectedExecutionOrder, actualExecutionOrder)
+        assertTrue(expectedExecutionOrder.equals(actualExecutionOrder))
     }
 
     @Test
