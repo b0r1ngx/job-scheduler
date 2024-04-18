@@ -26,14 +26,14 @@ internal class SchedulerTest {
         val fourthTask = Task(Priority.HIGH, "4")
         val fifthTask = Task(Priority.LOW, "5")
 
-        scheduler.addTask(thirdTask) // 3
         scheduler.addTask(firstTask)
-        scheduler.addTask(fifthTask) // 5
-        scheduler.addTask(fourthTask)
+        scheduler.addTask(thirdTask) // 3
+        scheduler.addTask(fourthTask) // 4
         scheduler.addTask(secondTask) // 2
+        scheduler.addTask(fifthTask)
 
         val expectedExecutionOrder = listOf(
-            firstTask, thirdTask, fifthTask, secondTask, fourthTask
+            firstTask, thirdTask, secondTask, fourthTask, fifthTask
         )
 
         val actualExecutionOrder = scheduler.start()
