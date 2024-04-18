@@ -1,4 +1,4 @@
-package model.task
+package task
 
 enum class Type {
     Extended, Basic

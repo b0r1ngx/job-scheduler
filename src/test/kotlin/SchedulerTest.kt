@@ -1,6 +1,5 @@
-import model.Scheduler
-import model.task.Priority
-import model.task.Task
+import task.Priority
+import task.Task
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

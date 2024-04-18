@@ -1,4 +1,4 @@
-package model.task
+package task
 
 import java.util.UUID
 

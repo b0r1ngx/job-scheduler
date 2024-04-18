@@ -1,7 +1,5 @@
-package model
-
-import model.task.Priority
-import model.task.Task
+import task.Priority
+import task.Task
 import java.util.LinkedList
 import java.util.NoSuchElementException
 
