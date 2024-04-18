@@ -5,23 +5,20 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class Scheduler {
-    private val scheduler: ExecutorService = Executors.newSingleThreadExecutor()
-    private val poolExecutor: ExecutorService = Executors.newSingleThreadExecutor()
+    private val executor: ExecutorService = Executors.newSingleThreadExecutor()
     val queue = Queue()
 
     fun start(): List<Task> {
         val executionOrder = mutableListOf<Task>()
 
-        scheduler.execute {
-            while (queue.size != 0) {
-                try {
-                    val task = queue.pop()
-                    executionOrder.add(task)
-                    poolExecutor.execute(task)
-                } catch (e: InterruptedException) {
-                    println(e.stackTraceToString())
-                    break
-                }
+        while (queue.size != 0) {
+            try {
+                val task = queue.pop()
+                executionOrder.add(task)
+                executor.execute(task)
+            } catch (e: Exception) {
+                println(e.stackTraceToString())
+                break
             }
         }
 
