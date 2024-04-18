@@ -1,4 +1,4 @@
-package model
+package model.task
 
 class Task(
     priority: Priority,

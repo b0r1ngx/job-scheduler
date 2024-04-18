@@ -1,6 +1,6 @@
-import model.Priority
+import model.task.Priority
 import model.Scheduler
-import model.Task
+import model.task.Task
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -14,7 +14,7 @@ internal class SchedulerTest {
         Priority.entries.forEach {
             val task = Task(priority = it)
             scheduler.addTask(task = task)
-            assertEquals(task, scheduler.queue.take())
+            assertEquals(task, scheduler.queue.poll())
         }
     }
 
