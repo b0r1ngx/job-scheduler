@@ -2,7 +2,6 @@ package task
 
 import statemachine.State
 import java.util.UUID
-import java.util.concurrent.atomic.AtomicLong
 
 class Task(
     priority: Priority,
@@ -12,7 +11,7 @@ class Task(
     var _priority: Priority = priority
         private set
 
-    private var state = State.Ready
+    private var state = State.Suspended
 
     override fun run() {
         Thread.sleep(1)
