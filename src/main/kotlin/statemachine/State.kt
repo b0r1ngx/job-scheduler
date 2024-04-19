@@ -19,17 +19,3 @@ sealed class State {
         fun activate() = Ready
     }
 }
-
-data class StateData(
-    val state: State
-)
-
-fun StateData.nextState() {
-//    this.copy(state = State.Suspended)
-//    state = when (state) {
-//        is State.Ready -> state.start()
-//        is State.Running -> TODO()
-//        is State.Suspended -> state.activate()
-//        is State.Waiting -> state.release()
-//    }
-}
