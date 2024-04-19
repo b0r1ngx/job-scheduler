@@ -53,4 +53,19 @@ internal class SchedulerTest {
         val actualExecutionOrder = scheduler.start()
         assertEquals(expectedExecutionOrder, actualExecutionOrder)
     }
+
+    @Test
+    fun WHEN_higher_priority_task_queued_THEN_current_executed_task_goes_to_queue() {
+        val firstTask = Task(Priority.CRITICAL, "1")
+        val secondTask = Task(Priority.HIGH, "2")
+
+        scheduler.addTask(secondTask)
+        val actualExecutionOrder = scheduler.start()
+        scheduler.addTask(firstTask)
+
+        assertEquals(
+            expected = listOf(firstTask, secondTask),
+            actual = actualExecutionOrder
+        )
+    }
 }
