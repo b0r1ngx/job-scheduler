@@ -1,11 +1,9 @@
 import task.Task
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
-class Scheduler {
-    private val executor: ExecutorService = Executors.newSingleThreadExecutor()
-    val queue = Queue()
-
+class Scheduler(
+    val queue: Queue,
+    private val processor: Processor
+) {
     fun start(): List<Task> {
         val executionOrder = mutableListOf<Task>()
 
@@ -13,7 +11,7 @@ class Scheduler {
             try {
                 val task = queue.pop()
                 executionOrder.add(task)
-                executor.execute(task)
+                processor.executor.execute(task)
             } catch (e: Exception) {
                 println(e.stackTraceToString())
                 break
@@ -21,6 +19,10 @@ class Scheduler {
         }
 
         return executionOrder
+    }
+
+    fun pick() {
+        queue.pop()
     }
 
     fun addTask(task: Task) {

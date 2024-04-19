@@ -5,8 +5,9 @@ import kotlin.test.assertEquals
 
 @Suppress("TestFunctionName")
 internal class SchedulerTest {
-
-    private val scheduler = Scheduler()
+    private val queue = Queue()
+    private val processor = Processor()
+    private val scheduler = Scheduler(queue, processor)
 
     @Test
     fun WHEN_adds_tasks_it_added_WHEN_pop_tasks_it_out() {
