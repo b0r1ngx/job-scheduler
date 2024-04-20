@@ -4,13 +4,8 @@ import java.util.LinkedList
 import java.util.NoSuchElementException
 
 class Queue {
-    private val queue = buildMap {
-        Priority.entries.forEach {
-            put(it, LinkedList<Task>())
-        }
-    }
-
-    var size: Int = 0
+    private val queue = buildMap { Priority.entries.forEach { put(it, LinkedList<Task>()) } }
+    private var size: Int = 0
 
     fun add(task: Task) {
         queue[task.priority]?.add(task)
