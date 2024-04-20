@@ -10,13 +10,13 @@ class System {
     val processor = Processor()
     val scheduler = Scheduler(queue, processor)
 
-    private val systemThread: ExecutorService = Executors.newSingleThreadExecutor()
+    private val thread: ExecutorService = Executors.newSingleThreadExecutor()
 
     // TODO: We need to understand where to fill this list, that we compare in tests!
     val terminatedTasks = listOf<Task>()
 
     init {
-        systemThread.execute {
+        thread.execute {
             while (true) {
                 Thread.sleep(1000)
                 suspendedTasks.forEach {
