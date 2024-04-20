@@ -7,9 +7,7 @@ class Scheduler(
     private var currentTaskOnExecution: Task? = null
 
     fun run() {
-        while (true) {
-            checkIfQueueHasMorePrioritizedTasks()
-        }
+        checkIfQueueHasMorePrioritizedTasks()
     }
 
     private fun checkIfQueueHasMorePrioritizedTasks() {
@@ -23,8 +21,6 @@ class Scheduler(
 
             processor.executor.shutdownNow()
             startExecutionOnProcessor(higherPriorityTask!!)
-            // check if queue.hasPriorityWithHigherTask, that current task
-            // drop current task from processor
         }
     }
 
