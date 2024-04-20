@@ -4,21 +4,20 @@ import java.util.LinkedList
 import java.util.NoSuchElementException
 
 class Queue {
-    private val queue = buildMap { Priority.entries.forEach { put(it, LinkedList<Task>()) } }
+
+    private val queue = buildMap {
+        Priority.entries.forEach { put(it, LinkedList<Task>()) }
+    }
+
     var size: Int = 0
         private set
-
-    fun add(task: Task) {
-        queue[task.priority]?.add(task)
-        size++
-    }
 
     fun pop(): Task {
         if (size > 0) {
             queue.forEach { (_, queue) ->
                 try {
                     return queue.pop().also {
-                        println("Queue.pop(): $it")
+                        println("QUEUE: popped task - $it")
                         size--
                     }
                 } catch (e: NoSuchElementException) {
@@ -38,4 +37,13 @@ class Queue {
         }
         return false to null
     }
+
+    fun add(task: Task) {
+        println("QUEUE: added task - $task")
+
+        queue[task.priority]?.add(task)
+        size++
+    }
+
+    override fun toString(): String = queue.toString()
 }

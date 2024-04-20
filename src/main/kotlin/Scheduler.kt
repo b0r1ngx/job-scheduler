@@ -1,13 +1,26 @@
 import task.Task
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class Scheduler(
-    val queue: Queue,
+    private val queue: Queue,
     private val processor: Processor
 ) {
     private var currentTaskOnExecution: Task? = null
 
     fun run() {
-        checkIfQueueHasMorePrioritizedTasks()
+        if (!processor.isProcessorCaptured && queue.size != 0) {
+            val task = queue.pop()
+            println("SCHEDULER: current choice - $task")
+            executeTaskOnProcessor(task)
+        }
+
+        //checkIfQueueHasMorePrioritizedTasks()
+    }
+
+    private fun executeTaskOnProcessor(task: Task) {
+        currentTaskOnExecution = task
+        processor.execute(task)
     }
 
     private fun checkIfQueueHasMorePrioritizedTasks() {
@@ -20,14 +33,9 @@ class Scheduler(
             println(currentTaskOnExecution)
 
             // TODO: if it may be helpful: here we can collect info of task that was shutdown.
-            processor.executor.shutdownNow()
-            startExecutionOnProcessor(higherPriorityTask!!)
+            //processor.executor.shutdownNow()
+            executeTaskOnProcessor(higherPriorityTask!!)
         }
-    }
-
-    private fun startExecutionOnProcessor(task: Task) {
-        currentTaskOnExecution = task
-        processor.executor.execute(task)
     }
 
     fun addTask(task: Task) {

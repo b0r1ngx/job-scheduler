@@ -6,21 +6,19 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class System {
-    private var suspendedTasks = listOf<Task>()
-
     private val queue = Queue()
     private val processor = Processor()
     private val scheduler = Scheduler(queue, processor)
 
     private val thread: ExecutorService = Executors.newSingleThreadExecutor()
 
+    private var suspendedTasks = listOf<Task>()
     // TODO: We need to understand where to fill this list, that we compare in tests!
     val terminatedTasks = listOf<Task>()
 
     fun run() {
-        thread.execute {
-            while (true) {
-                Thread.sleep(10)
+        thread.submit {
+            while (suspendedTasks.isNotEmpty()) {
                 decreaseSuspendedTasksTimeAndMoveReadyTasksToQueue()
             }
         }
@@ -32,12 +30,11 @@ class System {
 
     private fun decreaseSuspendedTasksTimeAndMoveReadyTasksToQueue() {
         suspendedTasks.forEach {
-            it.decreaseSuspendingTime()
-            if (it.state == State.READY) {
-                println("Add task: $it to queue")
-                suspendedTasks = suspendedTasks.filter { x -> x != it }
-                queue.add(it)
-            }
+            Thread.sleep(it.suspendingTime)
+            println("SYSTEM: task activated - $it")
+            it.activate()
+            suspendedTasks = suspendedTasks.filter { x -> x != it }
+            queue.add(it)
         }
     }
 
@@ -57,7 +54,7 @@ fun main() {
     Priority.entries.forEach {
         multiplier *= 2
         expectedOrderOfTaskTermination.add(
-            BasicTask(priority = it, suspendingTime = 1L * multiplier)
+            BasicTask(priority = it, suspendingTime = 10000) // suspendingTime = 1L * multiplier)
         )
     }
 

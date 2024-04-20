@@ -6,7 +6,7 @@ interface Task : Runnable {
     var state: State
     val priority: Priority
     val executionTime: Long
-    var suspendingTime: Long
+    val suspendingTime: Long
 
     fun activate()
 
@@ -15,6 +15,4 @@ interface Task : Runnable {
     fun preempt()
 
     fun terminate()
-
-    fun decreaseSuspendingTime()
 }

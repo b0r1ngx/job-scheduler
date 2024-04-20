@@ -18,6 +18,7 @@ class ExtendedTask(
         }
     }
 
+    // Произошло по крайней мере одно событие, которое ожидала задача
     fun release() {
         if (state == State.WAITING) {
             state = State.READY

@@ -4,18 +4,21 @@ import java.util.concurrent.Executors
 
 class Processor {
     private var thread: ExecutorService = Executors.newSingleThreadExecutor()
-    var isFree = true
+    var isProcessorCaptured = false
         private set
 
     fun execute(task: Task) {
-        isFree = false
-        thread.execute(task)
-        isFree = true
+        isProcessorCaptured = true
+        val result = thread.submit(task).get()
+        if (result == null) {
+            isProcessorCaptured = false
+        }
     }
 
     fun shutdownNow() {
+        println("PROCESSOR: shutted down")
         thread.shutdownNow()
         thread = Executors.newSingleThreadExecutor()
-        isFree = true
+        isProcessorCaptured = false
     }
 }

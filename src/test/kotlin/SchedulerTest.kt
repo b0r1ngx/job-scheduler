@@ -1,11 +1,7 @@
 import task.BasicTask
 import task.Priority
 import task.Task
-import java.lang.System
-import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.assertEquals
 
 @Suppress("TestFunctionName")
 internal class SchedulerTest {
@@ -83,5 +79,17 @@ internal class SchedulerTest {
         )
 
          */
+    }
+
+    @Test
+    fun systemInit() {
+        val tasks = listOf(
+            BasicTask(name="1"),
+            BasicTask(name="2"),
+            BasicTask(name="3")
+        )
+
+        system.addTasks(tasks)
+        system.run()
     }
 }
