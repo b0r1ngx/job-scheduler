@@ -12,11 +12,12 @@ class Scheduler(
 
     private fun checkIfQueueHasMorePrioritizedTasks() {
         while (true) {
-            println(currentTaskOnExecution)
             val (isHigherPriorityTaskAppeared, higherPriorityTask) =
                 queue.popHigherTaskIfExists(currentTaskPriority = currentTaskOnExecution?.priority)
 
+//            println(currentTaskOnExecution)
             if (!isHigherPriorityTaskAppeared) continue
+            println(currentTaskOnExecution)
 
             // TODO: if it may be helpful: here we can collect info of task that was shutdown.
             processor.executor.shutdownNow()

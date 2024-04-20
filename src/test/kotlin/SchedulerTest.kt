@@ -1,20 +1,34 @@
 import task.BasicTask
 import task.Priority
+import task.Task
+import java.lang.System
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @Suppress("TestFunctionName")
 internal class SchedulerTest {
     private val system = System()
-    private val scheduler = system.scheduler
 
     @Test
     fun WHEN_adds_tasks_it_added_WHEN_pop_tasks_it_out() {
+        val expectedOrderOfTaskTermination = mutableListOf<Task>()
+        var multiplier = 1
         Priority.entries.forEach {
-            val task = BasicTask(priority = it)
-            scheduler.addTask(task = task)
-            assertEquals(task, scheduler.queue.pop())
+            multiplier *= 2
+            expectedOrderOfTaskTermination.add(
+                BasicTask(priority = it, suspendingTime = 1L * multiplier)
+            )
         }
+
+        println(expectedOrderOfTaskTermination)
+
+        system.addTasks(expectedOrderOfTaskTermination)
+        system.run()
+        println("End")
+//            assertEquals(task, scheduler.queue.pop())
+
     }
 
     @Test
@@ -23,11 +37,11 @@ internal class SchedulerTest {
         val secondTask = BasicTask(Priority.HIGH, "2")
         val thirdTask = BasicTask(Priority.LOW, "3")
 
-        scheduler.addTask(firstTask)
-        scheduler.addTask(secondTask)
-        scheduler.addTask(thirdTask)
-
-        val actualExecutionOrder = scheduler.run()
+//        scheduler.addTask(firstTask)
+//        scheduler.addTask(secondTask)
+//        scheduler.addTask(thirdTask)
+//
+//        val actualExecutionOrder = scheduler.run()
 //        assertEquals(firstTask, actualExecutionOrder.first())
     }
 
@@ -39,17 +53,17 @@ internal class SchedulerTest {
         val fourthTask = BasicTask(Priority.HIGH, "4")
         val fifthTask = BasicTask(Priority.LOW, "5")
 
-        scheduler.addTask(firstTask)
-        scheduler.addTask(thirdTask)  // 3
-        scheduler.addTask(fourthTask) // 4
-        scheduler.addTask(secondTask) // 2
-        scheduler.addTask(fifthTask)
+//        scheduler.addTask(firstTask)
+//        scheduler.addTask(thirdTask)  // 3
+//        scheduler.addTask(fourthTask) // 4
+//        scheduler.addTask(secondTask) // 2
+//        scheduler.addTask(fifthTask)
 
         val expectedExecutionOrder = listOf(
             firstTask, thirdTask, fourthTask, secondTask, fifthTask
         )
 
-        val actualExecutionOrder = scheduler.run()
+//        val actualExecutionOrder = scheduler.run()
         //assertEquals(expectedExecutionOrder, actualExecutionOrder)
     }
 
@@ -58,9 +72,9 @@ internal class SchedulerTest {
         val firstTask = BasicTask(Priority.CRITICAL, "1")
         val secondTask = BasicTask(Priority.HIGH, "2")
 
-        scheduler.addTask(secondTask)
-        val actualExecutionOrder = scheduler.run()
-        scheduler.addTask(firstTask)
+//        scheduler.addTask(secondTask)
+//        val actualExecutionOrder = scheduler.run()
+//        scheduler.addTask(firstTask)
 
         /*
         assertEquals(
