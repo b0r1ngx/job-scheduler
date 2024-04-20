@@ -8,11 +8,11 @@ class Scheduler(
 
     fun run() {
         while (true) {
-            checkIfQueueHasMorePrioritedTasks()
+            checkIfQueueHasMorePrioritizedTasks()
         }
     }
 
-    private fun checkIfQueueHasMorePrioritedTasks() {
+    private fun checkIfQueueHasMorePrioritizedTasks() {
         while (true) {
             val (isHigherPriorityTaskAppeared, higherPriorityTask) =
                 queue.hasTasksWithPriorityHigherThanCurrentTaskThenPopHigherTask(
