@@ -20,8 +20,8 @@ class System {
             while (true) {
                 Thread.sleep(1000)
                 suspendedTasks.forEach {
-                    it.decreaseTimeToTaskGoesFromSuspendedToReady()
-                    if (it.isTaskReady()) {
+                    it.decreaseSuspendingTime()
+                    if (it.state == State.READY) {
                         val taskThatGoesToReadyState = it
                         suspendedTasks.remove(taskThatGoesToReadyState)
                         // TODO: !

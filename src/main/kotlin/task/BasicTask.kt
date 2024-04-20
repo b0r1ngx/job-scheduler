@@ -3,18 +3,17 @@ package task
 import statemachine.State
 import java.util.*
 
-class BasicTask(
-    val priority: Priority = Priority.LOW,
-    val name: String = UUID.randomUUID().toString(),
-    val executionTime: Long = 1000,
-    private var suspendingTime: Int = 1000
-) : Runnable {
+open class BasicTask(
+    override val priority: Priority = Priority.LOW,
+    override val name: String = UUID.randomUUID().toString(),
+    override val executionTime: Long = 1000,
+    override var suspendingTime: Long = 1000
+) : Task {
 
-    var state: State = State.SUSPENDED
-        private set
+    override var state: State = State.SUSPENDED
 
     // Новая задача переводится в состояние готовности
-    private fun activate() {
+    override fun activateSM() {
         if (state == State.SUSPENDED) {
             state = State.READY
         } else {
@@ -23,7 +22,7 @@ class BasicTask(
     }
 
     // Выполняется задача, выбранная планировщиком
-    fun start() {
+    override fun startSM() {
         if (state == State.READY) {
             state = State.RUNNING
             run()
@@ -33,7 +32,7 @@ class BasicTask(
     }
 
     // Планировщик запускает другую задачу. Запущенная задача переводится в состояние готовности
-    fun preempt() {
+    override fun preemptSM() {
         if (state == State.RUNNING) {
             state = State.READY
         } else {
@@ -42,7 +41,7 @@ class BasicTask(
     }
 
     // Запушенная задача переходит в состояние suspended
-    private fun terminate() {
+    override fun terminateSM() {
         if (state == State.RUNNING) {
             state = State.SUSPENDED
         } else {
@@ -52,7 +51,7 @@ class BasicTask(
 
     override fun run() {
         Thread.sleep(executionTime)
-        terminate()
+        terminateSM()
     }
 
     override fun toString(): String {
@@ -60,10 +59,10 @@ class BasicTask(
                 "suspendingTime=$suspendingTime)"
     }
 
-    fun decreaseSuspendingTime() {
+    override fun decreaseSuspendingTime() {
         suspendingTime -= 1
         if (suspendingTime <= 0) {
-            activate()
+            activateSM()
         }
     }
 }
