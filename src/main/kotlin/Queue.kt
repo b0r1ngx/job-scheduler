@@ -17,7 +17,10 @@ class Queue {
         if (size > 0) {
             queue.forEach { (_, queue) ->
                 try {
-                    return queue.pop().also { size-- }
+                    return queue.pop().also {
+                        println("Queue.pop(): $it")
+                        size--
+                    }
                 } catch (e: NoSuchElementException) {
                     return@forEach
                 }
