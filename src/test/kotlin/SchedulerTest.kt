@@ -5,9 +5,8 @@ import kotlin.test.assertEquals
 
 @Suppress("TestFunctionName")
 internal class SchedulerTest {
-    private val queue = Queue()
-    private val processor = Processor()
-    private val scheduler = Scheduler(queue, processor)
+    private val system = System()
+    private val scheduler = system.scheduler
 
     @Test
     fun WHEN_adds_tasks_it_added_WHEN_pop_tasks_it_out() {
@@ -28,7 +27,8 @@ internal class SchedulerTest {
         scheduler.addTask(secondTask)
         scheduler.addTask(thirdTask)
 
-        val actualExecutionOrder = scheduler.start()
+        val actualExecutionOrder = scheduler.run()
+
         assertEquals(firstTask, actualExecutionOrder.first())
     }
 
@@ -50,7 +50,7 @@ internal class SchedulerTest {
             firstTask, thirdTask, fourthTask, secondTask, fifthTask
         )
 
-        val actualExecutionOrder = scheduler.start()
+        val actualExecutionOrder = scheduler.run()
         assertEquals(expectedExecutionOrder, actualExecutionOrder)
     }
 
@@ -60,7 +60,7 @@ internal class SchedulerTest {
         val secondTask = Task(Priority.HIGH, "2")
 
         scheduler.addTask(secondTask)
-        val actualExecutionOrder = scheduler.start()
+        val actualExecutionOrder = scheduler.run()
         scheduler.addTask(firstTask)
 
         assertEquals(

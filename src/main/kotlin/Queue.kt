@@ -13,7 +13,7 @@ class Queue {
     var size: Int = 0
 
     fun add(task: Task) {
-        queue[task._priority]?.add(task)
+        queue[task.priority]?.add(task)
         size++
     }
 

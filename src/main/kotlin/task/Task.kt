@@ -3,22 +3,31 @@ package task
 import statemachine.State
 import java.util.UUID
 
+// TODO: For Sergey, Bind State to Task, to States start live by lifecycle
 class Task(
-    priority: Priority,
+    val priority: Priority,
     val name: String = UUID.randomUUID().toString(),
-    val type: Type = Type.Basic
+    val type: Type = Type.Basic,
+    val timeToExecute: Long = 1000,
+    private var timeToTaskGoesFromSuspendedToReady: Int = 1000
 ) : Runnable {
-    var _priority: Priority = priority
+    var state: State = State.Suspended
         private set
 
-    private var state = State.Suspended
-
     override fun run() {
-        Thread.sleep(1)
+        Thread.sleep(timeToExecute)
         // after run process success -> became to next state?
     }
 
+    fun decreaseTimeToTaskGoesFromSuspendedToReady() {
+        timeToTaskGoesFromSuspendedToReady -= 1
+    }
+
+    fun isTaskReady() =
+        timeToTaskGoesFromSuspendedToReady == 0
+
+
     override fun toString(): String {
-        return "Task(name=$name, type=$type, priority=$_priority)"
+        return "Task(name=$name, type=$type, priority=$priority)"
     }
 }

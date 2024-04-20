@@ -4,10 +4,19 @@ class Scheduler(
     val queue: Queue,
     private val processor: Processor
 ) {
-    fun start(): List<Task> {
+    fun run(): List<Task> {
         val executionOrder = mutableListOf<Task>()
 
-        while (queue.size != 0) {
+        while (true) {
+            val isQueueEmpty = queue.size != 0
+
+            if (isQueueEmpty) {
+                continue
+            }
+
+            // TODO: For Kirill, If current executed task.priority on processor is lower, than appeared task in Queue,
+            //  processor must pause, task must goes to State.Suspended, and processor must execute new task
+
             try {
                 val task = queue.pop()
                 executionOrder.add(task)
