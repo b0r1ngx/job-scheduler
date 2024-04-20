@@ -3,7 +3,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class Processor {
-    private val executor: ExecutorService = Executors.newSingleThreadExecutor()
+    private var executor: ExecutorService = Executors.newSingleThreadExecutor()
     var isFree = true
         private set
 
@@ -15,5 +15,7 @@ class Processor {
 
     fun shutdownNow() {
         executor.shutdownNow()
+        executor = Executors.newSingleThreadExecutor()
+        isFree = true
     }
 }
