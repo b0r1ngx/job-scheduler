@@ -13,9 +13,7 @@ class Scheduler(
     private fun checkIfQueueHasMorePrioritizedTasks() {
         while (true) {
             val (isHigherPriorityTaskAppeared, higherPriorityTask) =
-                queue.hasTasksWithPriorityHigherThanCurrentTaskThenPopHigherTask(
-                    currentTask = currentTaskOnExecution?.priority
-                )
+                queue.popHigherTaskIfExists(currentTaskPriority = currentTaskOnExecution?.priority)
 
             if (isHigherPriorityTaskAppeared) continue
 
