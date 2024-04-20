@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class System {
-    private val suspendedTasks = mutableListOf<Task>()
+    private var suspendedTasks = listOf<Task>()
 
     private val queue = Queue()
     private val processor = Processor()
@@ -31,11 +31,11 @@ class System {
     }
 
     private fun decreaseSuspendedTasksTimeAndMoveReadyTasksToQueue() {
-        println("decreaseSuspendedTasksTimeAndMoveReadyTasksToQueue")
         suspendedTasks.forEach {
             it.decreaseSuspendingTime()
             if (it.state == State.READY) {
-                suspendedTasks.remove(it)
+                println("Add task: $it to queue")
+                suspendedTasks = suspendedTasks.filter { x -> x != it }
                 queue.add(it)
             }
         }
@@ -43,11 +43,11 @@ class System {
 
     fun addTasks(tasks: List<Task>) {
         // TODO: if we want add some logic to `addTask()`, use: tasks.forEach { addTask(it) }
-        suspendedTasks.addAll(tasks)
+        suspendedTasks = suspendedTasks + tasks
     }
 
     fun addTask(task: Task) {
-        suspendedTasks.add(task)
+        suspendedTasks = suspendedTasks + listOf(task)
     }
 }
 
