@@ -3,19 +3,19 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class Processor {
-    private var executor: ExecutorService = Executors.newSingleThreadExecutor()
+    private var thread: ExecutorService = Executors.newSingleThreadExecutor()
     var isFree = true
         private set
 
     fun execute(task: Task) {
         isFree = false
-        executor.execute(task)
+        thread.execute(task)
         isFree = true
     }
 
     fun shutdownNow() {
-        executor.shutdownNow()
-        executor = Executors.newSingleThreadExecutor()
+        thread.shutdownNow()
+        thread = Executors.newSingleThreadExecutor()
         isFree = true
     }
 }
