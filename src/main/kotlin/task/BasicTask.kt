@@ -1,6 +1,5 @@
 package task
 
-import statemachine.State
 import java.util.*
 
 open class BasicTask(
@@ -12,57 +11,55 @@ open class BasicTask(
 
     override var state: State = State.SUSPENDED
 
-    // Новая задача переводится в состояние готовности
-    override fun activateSM() {
-        if (state == State.SUSPENDED) {
-            state = State.READY
-        } else {
-            throw Exception("Illegal state of the task $name: $state but must be SUSPENDED")
-        }
-    }
-
-    // Выполняется задача, выбранная планировщиком
-    override fun startSM() {
-        if (state == State.READY) {
-            state = State.RUNNING
-            run()
-        } else {
-            throw Exception("Illegal state of the task $name: $state but must be READY")
-        }
-    }
-
-    // Планировщик запускает другую задачу. Запущенная задача переводится в состояние готовности
-    override fun preemptSM() {
-        if (state == State.RUNNING) {
-            state = State.READY
-        } else {
-            throw Exception("Illegal state of the task $name: $state but must be RUNNING")
-        }
-    }
-
-    // Запушенная задача переходит в состояние suspended
-    override fun terminateSM() {
-        if (state == State.RUNNING) {
-            state = State.SUSPENDED
-        } else {
-            throw Exception("Illegal state of the task $name: $state but must be RUNNING")
-        }
-    }
-
     override fun run() {
         Thread.sleep(executionTime)
-        terminateSM()
-    }
-
-    override fun toString(): String {
-        return "BasicTask(name=$name, type=Basic, state=$state, priority=$priority, executionTime=$executionTime, " +
-                "suspendingTime=$suspendingTime)"
+        terminate()
     }
 
     override fun decreaseSuspendingTime() {
         suspendingTime -= 1
         if (suspendingTime <= 0) {
-            activateSM()
+            activate()
         }
     }
+
+    // Новая задача переводится в состояние готовности
+    override fun activate() {
+        if (state == State.SUSPENDED) {
+            state = State.READY
+        } else {
+            throw Exception("Illegal state of the task $name: state was $state but must be SUSPENDED")
+        }
+    }
+
+    // Выполняется задача, выбранная планировщиком
+    override fun start() {
+        if (state == State.READY) {
+            state = State.RUNNING
+            run()
+        } else {
+            throw Exception("Illegal state of the task $name: state was $state but must be READY")
+        }
+    }
+
+    // Планировщик запускает другую задачу. Запущенная задача переводится в состояние готовности
+    override fun preempt() {
+        if (state == State.RUNNING) {
+            state = State.READY
+        } else {
+            throw Exception("Illegal state of the task $name: state was $state but must be RUNNING")
+        }
+    }
+
+    // Запушенная задача переходит в состояние suspended
+    override fun terminate() {
+        if (state == State.RUNNING) {
+            state = State.SUSPENDED
+        } else {
+            throw Exception("Illegal state of the task $name: state was $state but must be RUNNING")
+        }
+    }
+
+    override fun toString() =
+        "BasicTask(name=$name, state=$state, priority=$priority, executionTime=$executionTime, suspendingTime=$suspendingTime)"
 }

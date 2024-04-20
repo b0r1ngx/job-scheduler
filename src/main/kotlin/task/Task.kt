@@ -1,21 +1,20 @@
 package task
 
-import statemachine.State
+interface Task : Runnable {
 
-interface Task: Runnable {
     val name: String
     var state: State
     val priority: Priority
     val executionTime: Long
     var suspendingTime: Long
 
-    fun activateSM()
+    fun activate()
 
-    fun startSM()
+    fun start()
 
-    fun preemptSM()
+    fun preempt()
 
-    fun terminateSM()
+    fun terminate()
 
     fun decreaseSuspendingTime()
 }
