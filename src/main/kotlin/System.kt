@@ -19,20 +19,22 @@ class System {
         thread.execute {
             while (true) {
                 Thread.sleep(1000)
-                suspendedTasks.forEach {
-                    it.decreaseSuspendingTime()
-                    if (it.state == State.READY) {
-                        val taskThatGoesToReadyState = it
-                        suspendedTasks.remove(taskThatGoesToReadyState)
-                        // TODO: !
-                        //(taskThatGoesToReadyState.state as State.Suspended).activate()
-                        queue.add(taskThatGoesToReadyState)
-                    }
-                }
+                moveReadyTasksToQueue()
             }
         }
 
         scheduler.run()
+    }
+
+    private fun moveReadyTasksToQueue() {
+        suspendedTasks.forEach {
+            it.decreaseSuspendingTime()
+            if (it.state == State.READY) {
+                val taskThatGoesToReadyState = it
+                suspendedTasks.remove(taskThatGoesToReadyState)
+                queue.add(taskThatGoesToReadyState)
+            }
+        }
     }
 }
 
