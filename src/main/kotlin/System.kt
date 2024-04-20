@@ -25,7 +25,7 @@ class System {
                         val taskThatGoesToReadyState = it
                         suspendedTasks.remove(taskThatGoesToReadyState)
                         // TODO: !
-                        (taskThatGoesToReadyState.state as State.Suspended).activate()
+                        //(taskThatGoesToReadyState.state as State.Suspended).activate()
                         queue.add(taskThatGoesToReadyState)
                     }
                 }
