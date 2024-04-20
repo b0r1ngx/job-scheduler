@@ -32,9 +32,9 @@ class Queue {
 
     fun popHigherTaskIfExists(currentTaskPriority: Priority?): Pair<Boolean, Task?> {
         if (currentTaskPriority != null) {
-            queue.forEach { (currentQueuePriority, queue) ->
-                if (currentQueuePriority > currentTaskPriority)
-                    return queue.isNotEmpty() to pop()
+            queue.forEach { (priority, queue) ->
+                if (priority > currentTaskPriority && queue.isNotEmpty())
+                    return true to pop()
             }
         }
         return false to null
