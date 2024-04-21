@@ -2,6 +2,8 @@ package task
 
 import java.util.*
 
+const val TAG = "TASK: "
+
 open class BasicTask(
     override val priority: Priority = Priority.LOW,
     override val name: String = UUID.randomUUID().toString(),
@@ -16,12 +18,12 @@ open class BasicTask(
         start()
 
         try {
-            println("Start run at job: $this")
+            println(TAG + "Start work: $this")
             Thread.sleep(executionTime)
-            println("End run at job: $this")
+            println(TAG + "End work: $this")
             isDone = true
         } catch (e: InterruptedException) {
-            println("Thread interrupted while sleeping")
+            println(TAG + "Thread interrupted while sleeping")
             return
         }
 
@@ -39,7 +41,7 @@ open class BasicTask(
     override fun activate() {
         if (state == State.SUSPENDED) {
             state = State.READY
-            println("Task goes READY: $this")
+            println(TAG + "Task goes READY: $this")
         } else {
             throw Exception("Illegal state of the task $name: state was $state but must be SUSPENDED")
         }
@@ -49,7 +51,7 @@ open class BasicTask(
     override fun start() {
         if (state == State.READY) {
             state = State.RUNNING
-            println("Task goes RUNNING: $this")
+            println(TAG + "Task goes RUNNING: $this")
         } else {
             throw Exception("Illegal state of the task $name: state was $state but must be READY")
         }
@@ -59,7 +61,7 @@ open class BasicTask(
     override fun preempt() {
         if (state == State.RUNNING) {
             state = State.READY
-            println("Task goes READY: $this")
+            println(TAG + "Task goes READY: $this")
         } else {
             throw Exception("Illegal state of the task $name: state was $state but must be RUNNING")
         }
@@ -69,7 +71,7 @@ open class BasicTask(
     override fun terminate() {
         if (state == State.RUNNING) {
             state = State.SUSPENDED
-            println("Task goes SUSPENDED: $this")
+            println(TAG + "Task goes SUSPENDED: $this")
         } else {
             throw Exception("Illegal state of the task $name: state was $state but must be RUNNING")
         }
