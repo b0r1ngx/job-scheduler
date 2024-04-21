@@ -3,7 +3,7 @@ import task.Task
 private const val TAG = "SCHEDULER:"
 
 class Scheduler(
-    val queue: Queue,
+    private val queue: Queue,
     private val processor: Processor
 ) {
     private var currentTaskOnExecution: Task? = null
