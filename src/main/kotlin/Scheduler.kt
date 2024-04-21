@@ -5,13 +5,9 @@ class Scheduler(
     val queue: Queue,
     private val processor: Processor
 ) {
-    private var currentTaskOnExecution: Task? = null
+    private var currentExecutingTask: Task? = null
 
     fun run(isTasksEnded: () -> Boolean) {
-        checkIfQueueHasMorePrioritizedTasks(isTasksEnded)
-    }
-
-    private fun checkIfQueueHasMorePrioritizedTasks(isTasksEnded: () -> Boolean) {
         while (isTasksEnded()) {
             if (processor.isFree && queue.size > 0) {
                 val currentChoice = queue.pop()
@@ -19,23 +15,24 @@ class Scheduler(
                 startExecutionOnProcessor(currentChoice)
             }
 
-            val (isHigherPriorityTaskAppeared, higherPriorityTask) =
-                queue.popHigherTaskIfExists(currentTaskPriority = currentTaskOnExecution?.priority)
+            val (isHigherTaskPriorityExists, higherTaskPriority) =
+                queue.popHigherTaskPriorityIfExists(currentExecutingTask?.priority)
 
             if (!isHigherPriorityTaskAppeared) continue
             currentTaskOnExecution?.let { logService.schedulerStoppingProcessingTask(it) }
 
+            println("$TAG $higherTaskPriority \$-_BEATS_-\$ $currentExecutingTask")
             processor.shutdownNow().also {
-                currentTaskOnExecution?.preempt().also {
-                    queue.add(currentTaskOnExecution!!)
+                currentExecutingTask?.preempt().also {
+                    queue.add(currentExecutingTask!!)
                 }
             }
-            startExecutionOnProcessor(higherPriorityTask!!)
+            occupyProcessorBy(task = higherTaskPriority!!)
         }
     }
 
-    private fun startExecutionOnProcessor(task: Task) {
-        currentTaskOnExecution = task
+    private fun occupyProcessorBy(task: Task) {
+        currentExecutingTask = task
         processor.submit(task)
     }
 }

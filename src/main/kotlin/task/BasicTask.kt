@@ -6,14 +6,15 @@ import java.util.*
 open class BasicTask(
     override val priority: Priority = Priority.LOW,
     override val name: String = UUID.randomUUID().toString(),
-    override val executionTime: Long = 1000,
-    override var suspendingTime: Long = 1000
+    override val executionTime: Long = 100,
+    override var suspendingTime: Long = 100
 ) : Task {
 
     private val logService = LogService()
 
     override var state: State = State.SUSPENDED
-    override var isDone: Boolean = false
+
+    override var postRunAction: (() -> Unit)? = null
 
     override fun run() {
         start()
@@ -26,7 +27,8 @@ open class BasicTask(
             return
         }
 
-        terminate() // when we shutdownNow this is executed, before sleep ends - this is not problem, just not terminate at scheduler - but its wrong behaviour!
+        terminate()
+        postRunAction?.invoke()
     }
 
     override fun decreaseSuspendingTime() {

@@ -22,6 +22,8 @@ class Processor(
         } else {
             logService.processorErrorWhileTaskExecution(task)
         }
+
+        thread.submit(task)
     }
 
     fun shutdownNow() {

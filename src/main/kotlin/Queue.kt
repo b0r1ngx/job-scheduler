@@ -33,7 +33,7 @@ class Queue(
         throw NoSuchElementException("Queue is empty")
     }
 
-    fun popHigherTaskIfExists(currentTaskPriority: Priority?): Pair<Boolean, Task?> {
+    fun popHigherTaskPriorityIfExists(currentTaskPriority: Priority?): Pair<Boolean, Task?> {
         if (currentTaskPriority != null) {
             queue.forEach { (priority, queue) ->
                 if (priority > currentTaskPriority && queue.isNotEmpty()) {
