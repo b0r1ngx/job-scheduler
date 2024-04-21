@@ -1,5 +1,3 @@
-import task.BasicTask
-import task.Priority
 import task.State
 import task.Task
 import java.util.concurrent.ExecutorService
@@ -58,22 +56,4 @@ class System {
     fun addTask(task: Task) {
         suspendedTasks = suspendedTasks + listOf(task)
     }
-}
-
-fun main() {
-    val firstTest = listOf<Task>(
-        BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 200),
-        BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 200),
-    )
-
-    val expectedOrderOfTaskTermination = listOf<Task>(
-        BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 200),
-        BasicTask(name = "2", priority = Priority.MEDIUM, suspendingTime = 1000),
-        BasicTask(name = "3", priority = Priority.HIGH, suspendingTime = 2000),
-        BasicTask(name = "4", priority = Priority.CRITICAL, suspendingTime = 3000)
-    )
-
-    val system = System()
-    system.addTasks(expectedOrderOfTaskTermination)
-    system.run()
 }

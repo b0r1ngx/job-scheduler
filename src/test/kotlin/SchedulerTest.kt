@@ -5,6 +5,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+// TODO: Rename it to SystemTest.kt
 @Suppress("TestFunctionName")
 internal class SchedulerTest {
     private val system = System()
@@ -17,7 +18,6 @@ internal class SchedulerTest {
 
     @Test
     fun WHEN_adds_tasks_it_added() {
-        // TODO: navigate it to SystemTest.kt
         assertTrue(system.suspendedTasks.isEmpty())
         system.addTask(BasicTask())
         assertTrue(system.suspendedTasks.isNotEmpty())
@@ -38,6 +38,31 @@ internal class SchedulerTest {
     fun WHEN_pop_tasks_it_out() {
         system.queue.pop()
         assertTrue(system.queue.size == 0)
+    }
+
+    @Test
+    fun WHEN_two_same_tasks_appeared_THEN_system_execute_its_orderly() {
+        val expectedTerminationOrder = listOf<Task>(
+            BasicTask(name = "1", priority = Priority.LOW, executionTime = 500, suspendingTime = 200),
+            BasicTask(name = "1", priority = Priority.LOW, executionTime = 500, suspendingTime = 200),
+        )
+
+        run(expectedTerminationOrder)
+        assertEquals(expected = expectedTerminationOrder, actual = system.terminatedTasks)
+    }
+
+    @Test
+    fun WHEN_various_tasks_appeared_THEN_system_execute_its_orderly() {
+        // before first task execution is end, highest task appeared in queue
+        val expectedTerminationOrder = listOf<Task>(
+            BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 200),
+            BasicTask(name = "2", priority = Priority.MEDIUM, suspendingTime = 1000),
+            BasicTask(name = "3", priority = Priority.HIGH, suspendingTime = 2000),
+            BasicTask(name = "4", priority = Priority.CRITICAL, suspendingTime = 3000)
+        )
+
+        run(expectedTerminationOrder)
+        assertEquals(expected = expectedTerminationOrder, actual = system.terminatedTasks)
     }
 
     @Test
