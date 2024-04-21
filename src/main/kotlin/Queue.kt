@@ -3,18 +3,18 @@ import task.Task
 import java.util.LinkedList
 import java.util.NoSuchElementException
 
-private const val TAG = "QUEUE:"
-
-class Queue {
+class Queue(
+    val logService: LogService
+) {
     private val queue: Map<Priority, LinkedList<Task>> = buildMap { Priority.entries.forEach { put(it, LinkedList()) } }
 
     var size: Int = 0
         private set
 
     fun add(task: Task) {
-        println("$TAG add(): $task")
         queue[task.priority]?.add(task)
         size++
+        logService.systemTaskPushedToQueue(task)
     }
 
     fun pop(): Task {
@@ -22,8 +22,8 @@ class Queue {
             queue.forEach { (_, queue) ->
                 try {
                     return queue.pop().also {
-                        println("$TAG pop(): $it")
                         size--
+                        logService.schedulerTaskPoppedFromQueue(it)
                     }
                 } catch (e: NoSuchElementException) {
                     return@forEach
@@ -38,7 +38,7 @@ class Queue {
             queue.forEach { (priority, queue) ->
                 if (priority > currentTaskPriority && queue.isNotEmpty()) {
                     val task = pop()
-                    println("$TAG popHigherTaskIfExists(): $task")
+                    logService.schedulerPoppedTaskWithHigherPriority(task)
                     return true to task
                 }
             }

@@ -2,33 +2,34 @@ import task.Task
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-private const val TAG = "PROCESSOR:"
-
-class Processor(private val onTaskTerminated: (task: Task) -> Unit) {
+class Processor(
+    val logService: LogService,
+    private val onTaskTerminated: (task: Task) -> Unit
+) {
     private var thread: ExecutorService = Executors.newSingleThreadExecutor()
     var isFree = true
         private set
 
     fun submit(task: Task) {
-        println("$TAG execute(): $task")
-        isFree = false
-//        thread.execute(task)
-//        isFree = true
+        logService.processorStartOfTaskExecution(task)
 
+        isFree = false
         val terminated = thread.submit(task).get()
         if (terminated == null) {
             onTaskTerminated(task)
             isFree = true
-            println("$TAG end execute(): $task")
+            logService.processorFinishOfTaskExecution(task)
         } else {
-            println("$TAG is it happens when we shutdown, or before task is executed on thread")
+            logService.processorErrorWhileTaskExecution(task)
         }
     }
 
     fun shutdownNow() {
-        println("$TAG shutdownNow()")
+        logService.processorThreadShutdown()
         thread.shutdownNow()
+
         thread = Executors.newSingleThreadExecutor()
         isFree = true
+        logService.processorThreadInitialization()
     }
 }

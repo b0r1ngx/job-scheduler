@@ -1,5 +1,6 @@
 package task
 
+import LogService
 import java.util.*
 
 class ExtendedTask(

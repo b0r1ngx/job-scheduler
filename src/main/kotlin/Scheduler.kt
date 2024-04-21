@@ -1,8 +1,7 @@
 import task.Task
 
-private const val TAG = "SCHEDULER:"
-
 class Scheduler(
+    val logService: LogService,
     val queue: Queue,
     private val processor: Processor
 ) {
@@ -15,15 +14,16 @@ class Scheduler(
     private fun checkIfQueueHasMorePrioritizedTasks(isTasksEnded: () -> Boolean) {
         while (isTasksEnded()) {
             if (processor.isFree && queue.size > 0) {
-                println("$TAG + start execute on processor, because its free")
-                startExecutionOnProcessor(queue.pop())
+                val currentChoice = queue.pop()
+                logService.schedulerCurrentChoice(currentChoice)
+                startExecutionOnProcessor(currentChoice)
             }
 
             val (isHigherPriorityTaskAppeared, higherPriorityTask) =
                 queue.popHigherTaskIfExists(currentTaskPriority = currentTaskOnExecution?.priority)
 
             if (!isHigherPriorityTaskAppeared) continue
-            println("$TAG 1s beats 2s - 1s:$higherPriorityTask, 2s:$currentTaskOnExecution")
+            currentTaskOnExecution?.let { logService.schedulerStoppingProcessingTask(it) }
 
             processor.shutdownNow().also {
                 currentTaskOnExecution?.preempt().also {
