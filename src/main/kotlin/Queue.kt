@@ -3,9 +3,7 @@ import task.Task
 import java.util.LinkedList
 import java.util.NoSuchElementException
 
-class Queue(
-    val logService: LogService,
-) {
+class Queue(private val logService: LogService) {
     private val queue: Map<Priority, LinkedList<Task>> = buildMap { Priority.entries.forEach { put(it, LinkedList()) } }
 
     var size: Int = 0
