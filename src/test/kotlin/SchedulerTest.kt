@@ -19,12 +19,14 @@ internal class SchedulerTest {
     @Test
     fun WHEN_adds_tasks_it_added() {
         assertTrue(system.suspendedTasks.isEmpty())
-        system.addTask(BasicTask())
+        system.addTask(BasicTask(suspendingTime = 1))
         assertTrue(system.suspendedTasks.isNotEmpty())
     }
 
     @Test
     fun WHEN_system_thread_logic_executes_THEN_task_goes_from_suspendedTasks_to_queue() {
+        WHEN_adds_tasks_it_added()
+
         assertTrue(system.queue.size == 0)
         assertTrue(system.suspendedTasks.isNotEmpty())
 
@@ -36,6 +38,12 @@ internal class SchedulerTest {
 
     @Test
     fun WHEN_pop_tasks_it_out() {
+        assertTrue(system.queue.size == 0)
+
+        system.queue.add(BasicTask())
+
+        assertTrue(system.queue.size != 0)
+
         system.queue.pop()
         assertTrue(system.queue.size == 0)
     }
@@ -55,9 +63,9 @@ internal class SchedulerTest {
         // before first task execution is end, highest task appeared in queue
         val expectedTerminationOrder = listOf<Task>(
             BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 200),
-            BasicTask(name = "2", priority = Priority.MEDIUM, suspendingTime = 1000),
-            BasicTask(name = "3", priority = Priority.HIGH, suspendingTime = 2000),
-            BasicTask(name = "4", priority = Priority.CRITICAL, suspendingTime = 3000)
+            BasicTask(name = "2", priority = Priority.MEDIUM, suspendingTime = 400),
+            BasicTask(name = "3", priority = Priority.HIGH, suspendingTime = 600),
+            BasicTask(name = "4", priority = Priority.CRITICAL, suspendingTime = 800)
         )
 
         run(expectedTerminationOrder)
