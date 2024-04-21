@@ -1,7 +1,7 @@
 package task
 
 import LogService
-import java.util.*
+import java.util.UUID
 
 open class BasicTask(
     override val priority: Priority = Priority.LOW,
@@ -10,18 +10,16 @@ open class BasicTask(
     override var suspendingTime: Long = 100
 ) : Task {
 
-    private val logService = LogService()
-
     override var state: State = State.SUSPENDED
-
     override var postRunAction: (() -> Unit)? = null
+
+    val logService = LogService()
 
     override fun run() {
         start()
 
         try {
             Thread.sleep(executionTime)
-            isDone = true
         } catch (e: InterruptedException) {
             logService.processorThreadInterruption()
             return

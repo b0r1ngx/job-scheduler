@@ -3,8 +3,8 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class Processor(
+    private val onTaskTerminated: (task: Task) -> Unit,
     val logService: LogService,
-    private val onTaskTerminated: (task: Task) -> Unit
 ) {
     private var thread: ExecutorService = Executors.newSingleThreadExecutor()
     var isFree = true
@@ -14,13 +14,11 @@ class Processor(
         logService.processorStartOfTaskExecution(task)
 
         isFree = false
-        val terminated = thread.submit(task).get()
-        if (terminated == null) {
+
+        task.postRunAction = {
             onTaskTerminated(task)
             isFree = true
             logService.processorFinishOfTaskExecution(task)
-        } else {
-            logService.processorErrorWhileTaskExecution(task)
         }
 
         thread.submit(task)
@@ -28,10 +26,11 @@ class Processor(
 
     fun shutdownNow() {
         logService.processorThreadShutdown()
-        thread.shutdownNow()
 
+        thread.shutdownNow()
         thread = Executors.newSingleThreadExecutor()
         isFree = true
+
         logService.processorThreadInitialization()
     }
 }

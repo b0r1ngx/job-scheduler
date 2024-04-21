@@ -2,20 +2,17 @@ import task.State
 import task.Task
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import kotlin.math.log
 
 class System {
-    val logService = LogService()
-
     var suspendedTasks = listOf<Task>()
-        private set(value) {
-            field = value
-        }
+        private set
+
     val terminatedTasks = mutableListOf<Task>()
 
+    private val logService = LogService()
     val queue = Queue(logService = logService)
-    private val processor = Processor(logService = logService, onTaskTerminated = terminatedTasks::add)
-    private val scheduler = Scheduler(logService = logService, queue = queue, processor = processor)
+    private val processor = Processor(onTaskTerminated = terminatedTasks::add, logService = logService)
+    private val scheduler = Scheduler(queue = queue, processor = processor, logService = logService)
 
     private val thread: ExecutorService = Executors.newSingleThreadExecutor()
 
@@ -45,11 +42,12 @@ class System {
     fun decreaseSuspendedTasksTimeAndMoveReadyTasksToQueue() {
         suspendedTasks.forEach { task ->
             task.decreaseSuspendingTime()
-            if (task.state == State.READY)
+            if (task.state == State.READY) {
                 queue.add(task).also {
                     suspendedTasks = suspendedTasks.filter { x -> x != task }
                     logService.systemActivatedTask(task, suspendedTasks.size)
                 }
+            }
         }
     }
 
@@ -61,5 +59,6 @@ class System {
 
     fun addTask(task: Task) {
         suspendedTasks = suspendedTasks + listOf(task)
+        logService.systemInit(suspendedTasks.size)
     }
 }

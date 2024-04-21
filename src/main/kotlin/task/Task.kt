@@ -10,12 +10,9 @@ interface Task : Runnable {
     var postRunAction: (() -> Unit)?
 
     fun activate()
-
     fun start()
-
     fun preempt()
-
     fun terminate()
-
     fun decreaseSuspendingTime()
+
 }

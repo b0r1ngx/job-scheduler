@@ -2,7 +2,7 @@ import task.BasicTask
 import task.State
 import task.Task
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
 
 class LogService {
 
