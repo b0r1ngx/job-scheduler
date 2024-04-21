@@ -34,9 +34,14 @@ class System {
         }
 
         while (isTasksEnded()) {
-            scheduler.run(isTasksEnded = isTasksEnded)
+            scheduler.run(isTasksEnded)
         }
+
+        terminationDelay()
     }
+
+    // sleep value must be more than execution time of last executed task
+    private fun terminationDelay() = Thread.sleep(1000)
 
     fun decreaseSuspendedTasksTimeAndMoveReadyTasksToQueue() {
         suspendedTasks.forEach { task ->
