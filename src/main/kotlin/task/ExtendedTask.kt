@@ -10,7 +10,7 @@ class ExtendedTask(
 ) : BasicTask(priority, name, executionTime, suspendingTime) {
 
     // Переход в состояние ожидания. Выполнение задачи продолжится только после выполнения события
-    fun _wait() {
+    fun await() {
         if (state == State.RUNNING) {
             state = State.WAITING
         } else {
