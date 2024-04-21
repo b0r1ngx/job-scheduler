@@ -6,37 +6,32 @@ class Scheduler(
     private val queue: Queue,
     private val processor: Processor
 ) {
-    private var currentTaskOnExecution: Task? = null
+    private var currentExecutingTask: Task? = null
 
     fun run(isTasksEnded: () -> Boolean) {
-        checkIfQueueHasMorePrioritizedTasks(isTasksEnded)
-    }
-
-    private fun checkIfQueueHasMorePrioritizedTasks(isTasksEnded: () -> Boolean) {
         while (isTasksEnded()) {
             if (processor.isFree && queue.size > 0) {
                 println("$TAG + start execute on processor, because its free")
-                startExecutionOnProcessor(queue.pop())
+                occupyProcessorBy(task = queue.pop())
             }
 
             val (isHigherPriorityTaskAppeared, higherPriorityTask) =
-                queue.popHigherTaskIfExists(currentTaskPriority = currentTaskOnExecution?.priority)
+                queue.popHigherTaskPriorityIfExists(currentExecutingTask?.priority)
 
             if (!isHigherPriorityTaskAppeared) continue
-            println("$TAG ${higherPriorityTask!!.name}s beats ${currentTaskOnExecution!!.name}s " +
-                    "- 1s:$higherPriorityTask, 2s:$currentTaskOnExecution")
 
+            println("$TAG $higherPriorityTask \$-_BEATS_-\$ $currentExecutingTask")
             processor.shutdownNow().also {
-                currentTaskOnExecution?.preempt().also {
-                    queue.add(currentTaskOnExecution!!)
+                currentExecutingTask?.preempt().also {
+                    queue.add(currentExecutingTask!!)
                 }
             }
-            startExecutionOnProcessor(higherPriorityTask)
+            occupyProcessorBy(task = higherPriorityTask!!)
         }
     }
 
-    private fun startExecutionOnProcessor(task: Task) {
-        currentTaskOnExecution = task
+    private fun occupyProcessorBy(task: Task) {
+        currentExecutingTask = task
         processor.submit(task)
     }
 }
