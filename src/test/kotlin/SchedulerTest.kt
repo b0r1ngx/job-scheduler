@@ -74,7 +74,7 @@ internal class SchedulerTest {
     fun WHEN_higher_priority_task_queued_THEN_current_executed_task_goes_to_queue() {
         val expectedTerminationOrder = listOf<Task>(
             BasicTask(Priority.CRITICAL, "2", suspendingTime = 50),
-            BasicTask(Priority.HIGH, "1", executionTime = 100, suspendingTime = 10)
+            BasicTask(Priority.HIGH, "1", suspendingTime = 10)
         )
         run(initialTasks = expectedTerminationOrder)
         assertEquals(expected = expectedTerminationOrder, actual = system.terminatedTasks)

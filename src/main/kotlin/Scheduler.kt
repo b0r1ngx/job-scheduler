@@ -11,22 +11,22 @@ class Scheduler(
     fun run(isTasksEnded: () -> Boolean) {
         while (isTasksEnded()) {
             if (processor.isFree && queue.size > 0) {
-                println("$TAG + start execute on processor, because its free")
+                println("$TAG + Lets occupy processor, because its free & Queue has tasks")
                 occupyProcessorBy(task = queue.pop())
             }
 
-            val (isHigherPriorityTaskAppeared, higherPriorityTask) =
+            val (isHigherTaskPriorityExists, higherTaskPriority) =
                 queue.popHigherTaskPriorityIfExists(currentExecutingTask?.priority)
 
-            if (!isHigherPriorityTaskAppeared) continue
+            if (!isHigherTaskPriorityExists) continue
 
-            println("$TAG $higherPriorityTask \$-_BEATS_-\$ $currentExecutingTask")
+            println("$TAG $higherTaskPriority \$-_BEATS_-\$ $currentExecutingTask")
             processor.shutdownNow().also {
                 currentExecutingTask?.preempt().also {
                     queue.add(currentExecutingTask!!)
                 }
             }
-            occupyProcessorBy(task = higherPriorityTask!!)
+            occupyProcessorBy(task = higherTaskPriority!!)
         }
     }
 
