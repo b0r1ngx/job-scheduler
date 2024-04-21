@@ -7,7 +7,7 @@ const val TAG = "TASK: "
 open class BasicTask(
     override val priority: Priority = Priority.LOW,
     override val name: String = UUID.randomUUID().toString(),
-    override val executionTime: Long = 1000,
+    override val executionTime: Long = 3000,
     override var suspendingTime: Long = 1000
 ) : Task {
 
@@ -18,9 +18,9 @@ open class BasicTask(
         start()
 
         try {
-            println(TAG + "Start work: $this")
+            println(TAG + "Start work, date: ${Calendar.getInstance().time}: $this")
             Thread.sleep(executionTime)
-            println(TAG + "End work: $this")
+            println(TAG + "End work, date: ${Calendar.getInstance().time}: $this")
             isDone = true
         } catch (e: InterruptedException) {
             println(TAG + "Thread interrupted while sleeping")
@@ -32,16 +32,14 @@ open class BasicTask(
 
     override fun decreaseSuspendingTime() {
         suspendingTime -= 1
-        if (suspendingTime <= 0) {
-            activate()
-        }
+        if (suspendingTime <= 0) activate()
     }
 
     // Новая задача переводится в состояние готовности
     override fun activate() {
         if (state == State.SUSPENDED) {
             state = State.READY
-            println(TAG + "Task goes READY: $this")
+            println(TAG + "activate(state -> READY): $this")
         } else {
             throw Exception("Illegal state of the task $name: state was $state but must be SUSPENDED")
         }
@@ -51,7 +49,7 @@ open class BasicTask(
     override fun start() {
         if (state == State.READY) {
             state = State.RUNNING
-            println(TAG + "Task goes RUNNING: $this")
+            println(TAG + "start(state -> RUNNING): $this")
         } else {
             throw Exception("Illegal state of the task $name: state was $state but must be READY")
         }
@@ -61,7 +59,7 @@ open class BasicTask(
     override fun preempt() {
         if (state == State.RUNNING) {
             state = State.READY
-            println(TAG + "Task goes READY: $this")
+            println(TAG + "preempt(state -> READY): $this")
         } else {
             throw Exception("Illegal state of the task $name: state was $state but must be RUNNING")
         }
@@ -71,7 +69,7 @@ open class BasicTask(
     override fun terminate() {
         if (state == State.RUNNING) {
             state = State.SUSPENDED
-            println(TAG + "Task goes SUSPENDED: $this")
+            println(TAG + "terminate(state -> SUSPENDED): $this")
         } else {
             throw Exception("Illegal state of the task $name: state was $state but must be RUNNING")
         }
