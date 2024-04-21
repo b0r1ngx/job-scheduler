@@ -9,7 +9,7 @@ class ExtendedTask(
     suspendingTime: Long = 100
 ) : BasicTask(priority, name, executionTime, suspendingTime) {
 
-    // Переход в состояние ожидания. Выполнение задачи продолжится только после выполнения события
+    // Выполнение задачи продолжится только после выполнения события
     fun await() {
         if (state == State.RUNNING) {
             state = State.WAITING
@@ -18,6 +18,7 @@ class ExtendedTask(
         }
     }
 
+    // Произошло по крайней мере одно событие, которое ожидала задача.
     fun release() {
         if (state == State.WAITING) {
             state = State.READY
