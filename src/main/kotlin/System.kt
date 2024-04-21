@@ -17,20 +17,18 @@ class System {
     // TODO: We need to understand where to fill this list, that we compare in tests!
     val terminatedTasks = listOf<Task>()
 
+    val isTasksEnded = { suspendedTasks.isNotEmpty() || queue.size != 0 }
+
     fun run() {
         thread.execute {
-            while (true) {
+            while (isTasksEnded()) {
                 Thread.sleep(10)
                 decreaseSuspendedTasksTimeAndMoveReadyTasksToQueue()
-
-                if (suspendedTasks.isEmpty() && queue.size == 0) {
-                    println("System don't have tasks in suspend list or queue - terminate system.")
-                    return@execute
-                }
             }
+            println("System don't have tasks in suspend list or queue - terminate system.")
         }
 
-        while (suspendedTasks.isNotEmpty() || queue.size != 0) {
+        while (isTasksEnded()) {
             scheduler.run()
         }
     }
@@ -58,17 +56,12 @@ class System {
 }
 
 fun main() {
-    val expectedOrderOfTaskTermination = mutableListOf<Task>()
-    var multiplier = 100
-    Priority.entries.forEach {
-        multiplier *= 2
-        expectedOrderOfTaskTermination.add(
-            BasicTask(priority = it, suspendingTime = 1L * multiplier)
-        )
-    }
-
-//    val expectedOrderOfTaskTermination = listOf(BasicTask(suspendingTime = 100))
-
+    val expectedOrderOfTaskTermination = listOf<Task>(
+        BasicTask(priority = Priority.LOW, suspendingTime = 200),
+        BasicTask(priority = Priority.MEDIUM, suspendingTime = 400),
+        BasicTask(priority = Priority.HIGH, suspendingTime = 800),
+        BasicTask(priority = Priority.CRITICAL, suspendingTime = 1600)
+    )
 
     val system = System()
     system.addTasks(expectedOrderOfTaskTermination)
