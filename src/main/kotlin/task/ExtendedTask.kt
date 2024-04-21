@@ -5,8 +5,8 @@ import java.util.*
 class ExtendedTask(
     priority: Priority = Priority.LOW,
     name: String = UUID.randomUUID().toString(),
-    executionTime: Long = 1000,
-    suspendingTime: Long = 1000
+    executionTime: Long = 100,
+    suspendingTime: Long = 100
 ) : BasicTask(priority, name, executionTime, suspendingTime) {
 
     // Переход в состояние ожидания. Выполнение задачи продолжится только после выполнения события

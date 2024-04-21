@@ -7,8 +7,8 @@ const val TAG = "TASK: "
 open class BasicTask(
     override val priority: Priority = Priority.LOW,
     override val name: String = UUID.randomUUID().toString(),
-    override val executionTime: Long = 1000,
-    override var suspendingTime: Long = 1000
+    override val executionTime: Long = 100,
+    override var suspendingTime: Long = 100
 ) : Task {
 
     override var state: State = State.SUSPENDED

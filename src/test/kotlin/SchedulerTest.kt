@@ -50,8 +50,7 @@ internal class SchedulerTest {
     @Test
     fun START_two_same_priority_tasks_THEN_system_execute_its_orderly() {
         val expectedTerminationOrder = listOf<Task>(
-            BasicTask(executionTime = 500, suspendingTime = 200),
-            BasicTask(executionTime = 500, suspendingTime = 200),
+            BasicTask(suspendingTime = 20), BasicTask(suspendingTime = 20),
         )
         run(initialTasks = expectedTerminationOrder)
         assertEquals(expected = expectedTerminationOrder, actual = system.terminatedTasks)
@@ -61,10 +60,10 @@ internal class SchedulerTest {
     fun START_various_tasks_THEN_system_executes_them_in_correct_order() {
         // before first task execution is end, highest task appeared in queue
         val expectedTerminationOrder = listOf<Task>(
-            BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 200),
-            BasicTask(name = "2", priority = Priority.MEDIUM, suspendingTime = 400),
-            BasicTask(name = "3", priority = Priority.HIGH, suspendingTime = 600),
-            BasicTask(name = "4", priority = Priority.CRITICAL, suspendingTime = 800)
+            BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 20),
+            BasicTask(name = "2", priority = Priority.MEDIUM, suspendingTime = 40),
+            BasicTask(name = "3", priority = Priority.HIGH, suspendingTime = 60),
+            BasicTask(name = "4", priority = Priority.CRITICAL, suspendingTime = 80)
         )
         run(initialTasks = expectedTerminationOrder)
         assertEquals(expected = expectedTerminationOrder, actual = system.terminatedTasks)
@@ -90,9 +89,9 @@ internal class SchedulerTest {
     @Test
     fun WHEN_higher_priority_task_queued_THEN_current_executed_task_goes_to_queue() {
         // before first task execution is end, highest task appeared in queue
-        val firstTaskSuspendingTime = 100L
-        val secondTaskSuspendingTime = 500L
-        val firstTask = BasicTask(Priority.HIGH, "1", executionTime = 1000, suspendingTime = firstTaskSuspendingTime)
+        val firstTaskSuspendingTime = 10L
+        val secondTaskSuspendingTime = 50L
+        val firstTask = BasicTask(Priority.HIGH, "1", executionTime = 100, suspendingTime = firstTaskSuspendingTime)
         val secondTask = BasicTask(Priority.CRITICAL, "2", suspendingTime = secondTaskSuspendingTime)
 
         val expectedTerminationOrder: List<Task> = listOf(secondTask, firstTask)
