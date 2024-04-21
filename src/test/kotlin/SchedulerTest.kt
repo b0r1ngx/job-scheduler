@@ -10,28 +10,27 @@ import kotlin.test.assertTrue
 internal class SchedulerTest {
     private val system = System()
 
-    private fun run(expectedTerminationOrder: List<Task>) = with(system) {
-        terminatedTasks.clear()
-        addTasks(expectedTerminationOrder)
-        run()
-    }
+    private fun run(initialTasks: List<Task>) =
+        with(system) {
+            terminatedTasks.clear()
+            addTasks(initialTasks)
+            run()
+        }
 
     @Test
-    fun WHEN_adds_tasks_it_added() {
+    fun WHEN_add_tasks_they_are_added() {
         assertTrue(system.suspendedTasks.isEmpty())
-        system.addTask(BasicTask(suspendingTime = 1))
+        system.addTask(BasicTask())
         assertTrue(system.suspendedTasks.isNotEmpty())
     }
 
     @Test
     fun WHEN_system_thread_logic_executes_THEN_task_goes_from_suspendedTasks_to_queue() {
-        WHEN_adds_tasks_it_added()
-
+        assertTrue(system.suspendedTasks.isEmpty())
+        system.addTask(BasicTask(suspendingTime = 1))
         assertTrue(system.queue.size == 0)
         assertTrue(system.suspendedTasks.isNotEmpty())
-
         system.decreaseSuspendedTasksTimeAndMoveReadyTasksToQueue()
-
         assertTrue(system.queue.size != 0)
         assertTrue(system.suspendedTasks.isEmpty())
     }
@@ -54,7 +53,7 @@ internal class SchedulerTest {
             BasicTask(executionTime = 500, suspendingTime = 200),
             BasicTask(executionTime = 500, suspendingTime = 200),
         )
-        run(expectedTerminationOrder)
+        run(initialTasks = expectedTerminationOrder)
         assertEquals(expected = expectedTerminationOrder, actual = system.terminatedTasks)
     }
 
@@ -67,8 +66,7 @@ internal class SchedulerTest {
             BasicTask(name = "3", priority = Priority.HIGH, suspendingTime = 600),
             BasicTask(name = "4", priority = Priority.CRITICAL, suspendingTime = 800)
         )
-
-        run(expectedTerminationOrder)
+        run(initialTasks = expectedTerminationOrder)
         assertEquals(expected = expectedTerminationOrder, actual = system.terminatedTasks)
     }
 
@@ -85,7 +83,7 @@ internal class SchedulerTest {
         val expectedTerminationOrder: List<Task> = listOf(
             firstTask, thirdTask, fourthTask, secondTask, fifthTask
         )
-        run(expectedTerminationOrder)
+        run(initialTasks = expectedTerminationOrder)
         assertEquals(expected = expectedTerminationOrder, actual = system.terminatedTasks)
     }
 
@@ -98,7 +96,7 @@ internal class SchedulerTest {
         val secondTask = BasicTask(Priority.CRITICAL, "2", suspendingTime = secondTaskSuspendingTime)
 
         val expectedTerminationOrder: List<Task> = listOf(secondTask, firstTask)
-        run(expectedTerminationOrder)
+        run(initialTasks = expectedTerminationOrder)
         assertEquals(expected = expectedTerminationOrder, actual = system.terminatedTasks)
     }
 }
