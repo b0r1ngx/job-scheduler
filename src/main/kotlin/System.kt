@@ -22,6 +22,11 @@ class System {
             while (true) {
                 Thread.sleep(10)
                 decreaseSuspendedTasksTimeAndMoveReadyTasksToQueue()
+
+                if (suspendedTasks.isEmpty() && queue.size == 0) {
+                    println("System don't have tasks in suspend list or queue - terminate system.")
+                    return@execute
+                }
             }
         }
 
@@ -31,12 +36,13 @@ class System {
     }
 
     private fun decreaseSuspendedTasksTimeAndMoveReadyTasksToQueue() {
-        suspendedTasks.forEach {
-            it.decreaseSuspendingTime()
-            if (it.state == State.READY) {
-                println("Add task: $it to queue")
-                suspendedTasks = suspendedTasks.filter { x -> x != it }
-                queue.add(it)
+        suspendedTasks.forEach { task ->
+            task.decreaseSuspendingTime()
+            if (task.state == State.READY) {
+                queue.add(task).also {
+                    suspendedTasks = suspendedTasks.filter { x -> x != task }
+                    println("Added task to queue, delete it from suspendedTasks: $task")
+                }
             }
         }
     }
@@ -53,13 +59,16 @@ class System {
 
 fun main() {
     val expectedOrderOfTaskTermination = mutableListOf<Task>()
-    var multiplier = 2
+    var multiplier = 100
     Priority.entries.forEach {
         multiplier *= 2
         expectedOrderOfTaskTermination.add(
             BasicTask(priority = it, suspendingTime = 1L * multiplier)
         )
     }
+
+//    val expectedOrderOfTaskTermination = listOf(BasicTask(suspendingTime = 100))
+
 
     val system = System()
     system.addTasks(expectedOrderOfTaskTermination)
