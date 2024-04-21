@@ -4,7 +4,7 @@ import java.util.concurrent.Executors
 
 class Processor(
     private val onTaskTerminated: (task: Task) -> Unit,
-    val logService: LogService,
+    private val logService: LogService,
 ) {
     private var thread: ExecutorService = Executors.newSingleThreadExecutor()
     var isFree = true
