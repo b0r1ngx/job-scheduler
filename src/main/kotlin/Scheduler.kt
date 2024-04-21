@@ -23,14 +23,15 @@ class Scheduler(
                 queue.popHigherTaskIfExists(currentTaskPriority = currentTaskOnExecution?.priority)
 
             if (!isHigherPriorityTaskAppeared) continue
-            println("$TAG 1s beats 2s - 1s:$higherPriorityTask, 2s:$currentTaskOnExecution")
+            println("$TAG ${higherPriorityTask!!.name}s beats ${currentTaskOnExecution!!.name}s " +
+                    "- 1s:$higherPriorityTask, 2s:$currentTaskOnExecution")
 
             processor.shutdownNow().also {
                 currentTaskOnExecution?.preempt().also {
                     queue.add(currentTaskOnExecution!!)
                 }
             }
-            startExecutionOnProcessor(higherPriorityTask!!)
+            startExecutionOnProcessor(higherPriorityTask)
         }
     }
 

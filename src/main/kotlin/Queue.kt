@@ -37,8 +37,8 @@ class Queue {
         if (currentTaskPriority != null) {
             queue.forEach { (priority, queue) ->
                 if (priority > currentTaskPriority && queue.isNotEmpty()) {
+                    println("$TAG popHigherTaskIfExists()")
                     val task = pop()
-                    println("$TAG popHigherTaskIfExists(): $task")
                     return true to task
                 }
             }
