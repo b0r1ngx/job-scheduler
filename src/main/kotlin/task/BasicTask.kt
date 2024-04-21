@@ -12,7 +12,8 @@ open class BasicTask(
 ) : Task {
 
     override var state: State = State.SUSPENDED
-    override var isDone: Boolean = false
+
+    override var postRunAction: (() -> Unit)? = null
 
     override fun run() {
         start()
@@ -21,13 +22,13 @@ open class BasicTask(
             println(TAG + "Start work, date: ${Calendar.getInstance().time}: $this")
             Thread.sleep(executionTime)
             println(TAG + "End work, date: ${Calendar.getInstance().time}: $this")
-            isDone = true
         } catch (e: InterruptedException) {
             println(TAG + "Thread interrupted while sleeping")
             return
         }
 
-        terminate() // when we shutdownNow this is executed, before sleep ends - this is not problem, just not terminate at scheduler - but its wrong behaviour!
+        terminate()
+        postRunAction?.invoke()
     }
 
     override fun decreaseSuspendingTime() {
