@@ -41,18 +41,17 @@ internal class SchedulerTest {
     }
 
     @Test
-    fun WHEN_two_same_tasks_appeared_THEN_system_execute_its_orderly() {
+    fun START_two_same_priority_tasks_THEN_system_execute_its_orderly() {
         val expectedTerminationOrder = listOf<Task>(
-            BasicTask(name = "1", priority = Priority.LOW, executionTime = 500, suspendingTime = 200),
-            BasicTask(name = "1", priority = Priority.LOW, executionTime = 500, suspendingTime = 200),
+            BasicTask(executionTime = 500, suspendingTime = 200),
+            BasicTask(executionTime = 500, suspendingTime = 200),
         )
-
         run(expectedTerminationOrder)
         assertEquals(expected = expectedTerminationOrder, actual = system.terminatedTasks)
     }
 
     @Test
-    fun WHEN_various_tasks_appeared_THEN_system_execute_its_orderly() {
+    fun START_various_tasks_THEN_system_executes_them_in_correct_order() {
         // before first task execution is end, highest task appeared in queue
         val expectedTerminationOrder = listOf<Task>(
             BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 200),
