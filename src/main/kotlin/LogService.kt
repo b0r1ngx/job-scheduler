@@ -1,4 +1,5 @@
 import task.BasicTask
+import task.ExtendedTask
 import task.State
 import task.Task
 import java.text.SimpleDateFormat
@@ -159,17 +160,17 @@ class LogService {
     }
 
     private fun getTaskShortInfo(task: Task): String =
-        if (task is BasicTask) {
-            "BasicTask(name=${task.name}, priority=${task.priority})"
-        } else {
+        if (task is ExtendedTask) {
             "ExtendedTask(name=${task.name}, priority=${task.priority}))"
+        } else {
+            "BasicTask(name=${task.name}, priority=${task.priority})"
         }
 
     private fun getTaskFullInfo(task: Task): String =
-        if (task is BasicTask) {
-            "BasicTask(${task.name}, ${task.state}, ${task.priority})"
-        } else {
+        if (task is ExtendedTask) {
             "ExtendedTask(${task.name}, ${task.state}, ${task.priority})"
+        } else {
+            "BasicTask(${task.name}, ${task.state}, ${task.priority})"
         }
 
     private enum class Tags {

@@ -1,4 +1,5 @@
 import task.BasicTask
+import task.ExtendedTask
 import task.Priority
 import task.Task
 import kotlin.test.Test
@@ -102,6 +103,22 @@ internal class SchedulerTest {
             BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 200),
         )
         run(initialTasks = expectedTerminationOrder)
+        assertEquals(expected = expectedTerminationOrder, actual = system.terminatedTasks)
+    }
+
+    @Test
+    fun START_extended_task() {
+        val input = listOf<Task>(
+            BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 100),
+            ExtendedTask(name = "2", priority = Priority.LOW, suspendingTime = 200, untilWaitTime = 50),
+            BasicTask(name = "3", priority = Priority.LOW, suspendingTime = 400)
+        )
+        val expectedTerminationOrder = listOf<Task>(
+            BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 0),
+            BasicTask(name = "3", priority = Priority.LOW, suspendingTime = 0),
+            ExtendedTask(name = "2", priority = Priority.LOW, suspendingTime = 0)
+        )
+        run(initialTasks = input)
         assertEquals(expected = expectedTerminationOrder, actual = system.terminatedTasks)
     }
 }

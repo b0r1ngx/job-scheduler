@@ -1,5 +1,7 @@
+import task.ExtendedTask
 import task.State
 import task.Task
+import java.util.Stack
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -9,16 +11,31 @@ class System {
 
     val terminatedTasks = mutableListOf<Task>()
 
+    val waitingTasks = Stack<Pair<ExtendedTask, Boolean>>()
+
     private val logService = LogService()
-    val queue = Queue(logService = logService)
-    private val processor = Processor(onTaskTerminated = terminatedTasks::add, logService = logService)
-    private val scheduler = Scheduler(queue = queue, processor = processor, logService = logService)
+    val queue = Queue(
+        logService = logService
+    )
+    private val processor = Processor(
+        onTaskTerminated = terminatedTasks::add,
+        onTaskWaiting = waitingTasks::push,
+        logService = logService
+    )
+    private val scheduler = Scheduler(
+        queue = queue,
+        processor = processor,
+        logService = logService,
+        waitingTasks = waitingTasks,
+        popWaitingTask = waitingTasks::pop,
+        pushWaitedTask = waitingTasks::push
+    )
 
     private val thread: ExecutorService = Executors.newSingleThreadExecutor()
 
     // TODO: We need to understand where to fill this list, that we compare in tests!
 
-    val isTasksEnded = { suspendedTasks.isNotEmpty() || queue.size != 0 }
+    val isTasksEnded = { suspendedTasks.isNotEmpty() || waitingTasks.isNotEmpty() || queue.size != 0 }
 
     fun run() {
         thread.submit {

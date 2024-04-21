@@ -1,9 +1,11 @@
+import task.ExtendedTask
 import task.Task
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class Processor(
     private val onTaskTerminated: (task: Task) -> Unit,
+    private val onTaskWaiting: (task: Pair<ExtendedTask, Boolean>) -> Unit,
     val logService: LogService,
 ) {
     private var thread: ExecutorService = Executors.newSingleThreadExecutor()
@@ -19,6 +21,13 @@ class Processor(
             onTaskTerminated(task)
             isFree = true
             logService.processorFinishOfTaskExecution(task)
+        }
+        if (task is ExtendedTask) {
+            task.waitAction = {
+                onTaskWaiting(task to false)
+                isFree = true
+                // TODO: add log for waiting action
+            }
         }
 
         thread.submit(task)
