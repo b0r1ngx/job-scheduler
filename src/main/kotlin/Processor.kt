@@ -12,17 +12,13 @@ class Processor(private val onTaskTerminated: (task: Task) -> Unit) {
     fun submit(task: Task) {
         println("$TAG execute(): $task")
         isFree = false
-//        thread.execute(task)
-//        isFree = true
 
-        val terminated = thread.submit(task).get()
-        if (terminated == null) {
+        task.postRunAction = {
             onTaskTerminated(task)
             isFree = true
-            println("$TAG end execute(): $task")
-        } else {
-            println("$TAG is it happens when we shutdown, or before task is executed on thread")
         }
+
+        thread.submit(task)
     }
 
     fun shutdownNow() {
