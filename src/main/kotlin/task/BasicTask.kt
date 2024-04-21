@@ -10,10 +10,22 @@ open class BasicTask(
 ) : Task {
 
     override var state: State = State.SUSPENDED
+    override var isDone: Boolean = false
 
     override fun run() {
-        Thread.sleep(executionTime)
-        terminate()
+        start()
+
+        try {
+            println("Start run at job: $this")
+            Thread.sleep(executionTime)
+            println("End run at job: $this")
+            isDone = true
+        } catch (e: InterruptedException) {
+            println("Thread interrupted while sleeping")
+            return
+        }
+
+        terminate() // when we shutdownNow this is executed, before sleep ends - this is not problem, just not terminate at scheduler - but its wrong behaviour!
     }
 
     override fun decreaseSuspendingTime() {
@@ -27,6 +39,7 @@ open class BasicTask(
     override fun activate() {
         if (state == State.SUSPENDED) {
             state = State.READY
+            println("Task goes READY: $this")
         } else {
             throw Exception("Illegal state of the task $name: state was $state but must be SUSPENDED")
         }
@@ -36,7 +49,7 @@ open class BasicTask(
     override fun start() {
         if (state == State.READY) {
             state = State.RUNNING
-            run()
+            println("Task goes RUNNING: $this")
         } else {
             throw Exception("Illegal state of the task $name: state was $state but must be READY")
         }
@@ -46,6 +59,7 @@ open class BasicTask(
     override fun preempt() {
         if (state == State.RUNNING) {
             state = State.READY
+            println("Task goes READY: $this")
         } else {
             throw Exception("Illegal state of the task $name: state was $state but must be RUNNING")
         }
@@ -55,6 +69,7 @@ open class BasicTask(
     override fun terminate() {
         if (state == State.RUNNING) {
             state = State.SUSPENDED
+            println("Task goes SUSPENDED: $this")
         } else {
             throw Exception("Illegal state of the task $name: state was $state but must be RUNNING")
         }
