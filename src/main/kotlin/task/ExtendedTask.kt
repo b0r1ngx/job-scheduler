@@ -1,6 +1,6 @@
 package task
 
-import java.util.*
+import java.util.UUID
 
 class ExtendedTask(
     priority: Priority = Priority.LOW,
