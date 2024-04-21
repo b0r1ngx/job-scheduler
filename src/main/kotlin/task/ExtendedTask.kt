@@ -1,6 +1,7 @@
 package task
 
-import java.util.UUID
+import LogService
+import java.util.*
 
 class ExtendedTask(
     priority: Priority = Priority.LOW,

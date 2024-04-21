@@ -2,21 +2,20 @@ import task.State
 import task.Task
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-
-private const val TAG = "SYSTEM:"
+import kotlin.math.log
 
 class System {
+    val logService = LogService()
+
     var suspendedTasks = listOf<Task>()
         private set(value) {
-            println("$TAG suspendedTasks.size: ${value.size}")
             field = value
         }
-
     val terminatedTasks = mutableListOf<Task>()
 
-    val queue = Queue()
-    private val processor = Processor(onTaskTerminated = terminatedTasks::add)
-    private val scheduler = Scheduler(queue, processor)
+    val queue = Queue(logService = logService)
+    private val processor = Processor(logService = logService, onTaskTerminated = terminatedTasks::add)
+    private val scheduler = Scheduler(logService = logService, queue = queue, processor = processor)
 
     private val thread: ExecutorService = Executors.newSingleThreadExecutor()
 
@@ -30,7 +29,7 @@ class System {
                 Thread.sleep(1)
                 decreaseSuspendedTasksTimeAndMoveReadyTasksToQueue()
             }
-            println("$TAG don't have tasks in suspend list or queue - terminate system.")
+            logService.systemTermination()
         }
 
         while (isTasksEnded()) {
@@ -49,6 +48,7 @@ class System {
             if (task.state == State.READY)
                 queue.add(task).also {
                     suspendedTasks = suspendedTasks.filter { x -> x != task }
+                    logService.systemActivatedTask(task, suspendedTasks.size)
                 }
         }
     }
@@ -56,6 +56,7 @@ class System {
     fun addTasks(tasks: List<Task>) {
         // TODO: if we want add some logic to `addTask()`, use: tasks.forEach { addTask(it) }
         suspendedTasks = suspendedTasks + tasks
+        logService.systemInit(suspendedTasks.size)
     }
 
     fun addTask(task: Task) {
