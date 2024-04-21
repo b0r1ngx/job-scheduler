@@ -13,6 +13,7 @@ class ExtendedTask(
     fun await() {
         if (state == State.RUNNING) {
             state = State.WAITING
+            println(TAG + "await(state -> WAITING): $this")
         } else {
             throw Exception("Illegal state of the task $name: state was $state but must be RUNNING")
         }
@@ -22,6 +23,7 @@ class ExtendedTask(
     fun release() {
         if (state == State.WAITING) {
             state = State.READY
+            println(TAG + "release(state -> READY): $this")
         } else {
             throw Exception("Illegal state of the task $name: state was $state but must be WAITING")
         }
