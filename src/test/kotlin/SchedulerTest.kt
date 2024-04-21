@@ -1,87 +1,72 @@
 import task.BasicTask
 import task.Priority
 import task.Task
-import java.lang.System
-import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @Suppress("TestFunctionName")
 internal class SchedulerTest {
     private val system = System()
 
-    @Test
-    fun WHEN_adds_tasks_it_added_WHEN_pop_tasks_it_out() {
-        val expectedOrderOfTaskTermination = mutableListOf<Task>()
-        var multiplier = 1
-        Priority.entries.forEach {
-            multiplier *= 2
-            expectedOrderOfTaskTermination.add(
-                BasicTask(priority = it, suspendingTime = 1L * multiplier)
-            )
-        }
-
-        println(expectedOrderOfTaskTermination)
-
-        system.addTasks(expectedOrderOfTaskTermination)
-        system.run()
-        println("End")
-//            assertEquals(task, scheduler.queue.pop())
-
+    private fun run(expectedTerminationOrder: List<Task>) = with(system) {
+        terminatedTasks.clear()
+        addTasks(expectedTerminationOrder)
+        run()
     }
 
     @Test
-    fun WHEN_different_priority_tasks_queued_THEN_highest_priority_task_picked() {
-        val firstTask = BasicTask(Priority.CRITICAL, "1")
-        val secondTask = BasicTask(Priority.HIGH, "2")
-        val thirdTask = BasicTask(Priority.LOW, "3")
+    fun WHEN_adds_tasks_it_added() {
+        // TODO: navigate it to SystemTest.kt
+        assertTrue(system.suspendedTasks.isEmpty())
+        system.addTask(BasicTask())
+        assertTrue(system.suspendedTasks.isNotEmpty())
+    }
 
-//        scheduler.addTask(firstTask)
-//        scheduler.addTask(secondTask)
-//        scheduler.addTask(thirdTask)
-//
-//        val actualExecutionOrder = scheduler.run()
-//        assertEquals(firstTask, actualExecutionOrder.first())
+    @Test
+    fun WHEN_system_thread_logic_executes_THEN_task_goes_from_suspendedTasks_to_queue() {
+        assertTrue(system.queue.size == 0)
+        assertTrue(system.suspendedTasks.isNotEmpty())
+
+        system.decreaseSuspendedTasksTimeAndMoveReadyTasksToQueue()
+
+        assertTrue(system.queue.size != 0)
+        assertTrue(system.suspendedTasks.isEmpty())
+    }
+
+    @Test
+    fun WHEN_pop_tasks_it_out() {
+        system.queue.pop()
+        assertTrue(system.queue.size == 0)
     }
 
     @Test
     fun WHEN_different_priority_tasks_queued_THEN_correct_order_of_execution_happened() {
+        // this test includes WHEN_different_priority_tasks_queued_THEN_highest_priority_task_picked
+        // TODO: Test for various suspendedTime, to proof that it matters when suspendedTime is various
         val firstTask = BasicTask(Priority.CRITICAL, "1")
         val secondTask = BasicTask(Priority.HIGH, "2")
         val thirdTask = BasicTask(Priority.HIGH, "3")
         val fourthTask = BasicTask(Priority.HIGH, "4")
         val fifthTask = BasicTask(Priority.LOW, "5")
 
-//        scheduler.addTask(firstTask)
-//        scheduler.addTask(thirdTask)  // 3
-//        scheduler.addTask(fourthTask) // 4
-//        scheduler.addTask(secondTask) // 2
-//        scheduler.addTask(fifthTask)
-
-        val expectedExecutionOrder = listOf(
+        val expectedTerminationOrder: List<Task> = listOf(
             firstTask, thirdTask, fourthTask, secondTask, fifthTask
         )
-
-//        val actualExecutionOrder = scheduler.run()
-        //assertEquals(expectedExecutionOrder, actualExecutionOrder)
+        run(expectedTerminationOrder)
+        assertEquals(expected = expectedTerminationOrder, actual = system.terminatedTasks)
     }
 
     @Test
     fun WHEN_higher_priority_task_queued_THEN_current_executed_task_goes_to_queue() {
-        val firstTask = BasicTask(Priority.CRITICAL, "1")
-        val secondTask = BasicTask(Priority.HIGH, "2")
+        // before first task execution is end, highest task appeared in queue
+        val firstTaskSuspendingTime = 100L
+        val secondTaskSuspendingTime = 500L
+        val firstTask = BasicTask(Priority.HIGH, "1", executionTime = 1000, suspendingTime = firstTaskSuspendingTime)
+        val secondTask = BasicTask(Priority.CRITICAL, "2", suspendingTime = secondTaskSuspendingTime)
 
-//        scheduler.addTask(secondTask)
-//        val actualExecutionOrder = scheduler.run()
-//        scheduler.addTask(firstTask)
-
-        /*
-        assertEquals(
-            expected = listOf(firstTask, secondTask),
-            actual = actualExecutionOrder
-        )
-
-         */
+        val expectedTerminationOrder: List<Task> = listOf(secondTask, firstTask)
+        run(expectedTerminationOrder)
+        assertEquals(expected = expectedTerminationOrder, actual = system.terminatedTasks)
     }
 }

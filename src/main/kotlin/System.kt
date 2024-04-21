@@ -5,39 +5,48 @@ import task.Task
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class System {
-    private var suspendedTasks = listOf<Task>()
+private const val TAG = "SYSTEM:"
 
-    private val queue = Queue()
-    private val processor = Processor()
+class System {
+    var suspendedTasks = listOf<Task>()
+        private set(value) {
+            println("$TAG suspendedTasks.size: ${value.size}")
+            field = value
+        }
+
+    val terminatedTasks = mutableListOf<Task>()
+
+    val queue = Queue()
+    private val processor = Processor(onTaskTerminated = terminatedTasks::add)
     private val scheduler = Scheduler(queue, processor)
 
     private val thread: ExecutorService = Executors.newSingleThreadExecutor()
 
     // TODO: We need to understand where to fill this list, that we compare in tests!
-    val terminatedTasks = listOf<Task>()
+
+    val isTasksEnded = { suspendedTasks.isNotEmpty() || queue.size != 0 }
 
     fun run() {
         thread.execute {
-            while (true) {
-                Thread.sleep(10)
+            while (isTasksEnded()) {
+                Thread.sleep(1)
                 decreaseSuspendedTasksTimeAndMoveReadyTasksToQueue()
             }
+            println("$TAG don't have tasks in suspend list or queue - terminate system.")
         }
 
-        while (suspendedTasks.isNotEmpty() || queue.size != 0) {
-            scheduler.run()
+        while (isTasksEnded()) {
+            scheduler.run(isTasksEnded = isTasksEnded)
         }
     }
 
-    private fun decreaseSuspendedTasksTimeAndMoveReadyTasksToQueue() {
-        suspendedTasks.forEach {
-            it.decreaseSuspendingTime()
-            if (it.state == State.READY) {
-                println("Add task: $it to queue")
-                suspendedTasks = suspendedTasks.filter { x -> x != it }
-                queue.add(it)
-            }
+    fun decreaseSuspendedTasksTimeAndMoveReadyTasksToQueue() {
+        suspendedTasks.forEach { task ->
+            task.decreaseSuspendingTime()
+            if (task.state == State.READY)
+                queue.add(task).also {
+                    suspendedTasks = suspendedTasks.filter { x -> x != task }
+                }
         }
     }
 
@@ -52,14 +61,17 @@ class System {
 }
 
 fun main() {
-    val expectedOrderOfTaskTermination = mutableListOf<Task>()
-    var multiplier = 2
-    Priority.entries.forEach {
-        multiplier *= 2
-        expectedOrderOfTaskTermination.add(
-            BasicTask(priority = it, suspendingTime = 1L * multiplier)
-        )
-    }
+    val firstTest = listOf<Task>(
+        BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 200),
+        BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 200),
+    )
+
+    val expectedOrderOfTaskTermination = listOf<Task>(
+        BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 200),
+        BasicTask(name = "2", priority = Priority.MEDIUM, suspendingTime = 1000),
+        BasicTask(name = "3", priority = Priority.HIGH, suspendingTime = 2000),
+        BasicTask(name = "4", priority = Priority.CRITICAL, suspendingTime = 3000)
+    )
 
     val system = System()
     system.addTasks(expectedOrderOfTaskTermination)

@@ -7,6 +7,7 @@ interface Task : Runnable {
     val priority: Priority
     val executionTime: Long
     var suspendingTime: Long
+    var isDone: Boolean
 
     fun activate()
 
