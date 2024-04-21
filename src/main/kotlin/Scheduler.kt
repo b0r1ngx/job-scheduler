@@ -36,6 +36,6 @@ class Scheduler(
 
     private fun startExecutionOnProcessor(task: Task) {
         currentTaskOnExecution = task
-        processor.execute(task)
+        processor.submit(task)
     }
 }

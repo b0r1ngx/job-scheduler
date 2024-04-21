@@ -27,7 +27,7 @@ class System {
     val isTasksEnded = { suspendedTasks.isNotEmpty() || queue.size != 0 }
 
     fun run() {
-        thread.execute {
+        thread.submit {
             while (isTasksEnded()) {
                 Thread.sleep(1)
                 decreaseSuspendedTasksTimeAndMoveReadyTasksToQueue()

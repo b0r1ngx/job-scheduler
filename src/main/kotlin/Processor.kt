@@ -9,7 +9,7 @@ class Processor(private val onTaskTerminated: (task: Task) -> Unit) {
     var isFree = true
         private set
 
-    fun execute(task: Task) {
+    fun submit(task: Task) {
         println("$TAG execute(): $task")
         isFree = false
 //        thread.execute(task)
