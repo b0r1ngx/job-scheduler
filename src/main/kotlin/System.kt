@@ -4,19 +4,19 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class System {
+    val terminatedTasks = mutableListOf<Task>()
     var suspendedTasks = listOf<Task>()
         private set
 
-    val terminatedTasks = mutableListOf<Task>()
-
     private val logService = LogService()
+
     val queue = Queue(logService = logService)
     private val processor = Processor(onTaskTermination = terminatedTasks::add, logService = logService)
     private val scheduler = Scheduler(queue = queue, processor = processor, logService = logService)
 
     private val thread: ExecutorService = Executors.newSingleThreadExecutor()
 
-    val isTasksEnded = { suspendedTasks.isNotEmpty() || queue.size != 0 }
+    val isTasksEnded = { suspendedTasks.isNotEmpty() || queue.size != 0 || scheduler.isThereWaitingTasks() }
 
     fun run() {
         thread.submit {
@@ -27,17 +27,9 @@ class System {
             logService.systemTermination()
         }
 
-        while (isTasksEnded()) {
-            scheduler.run(isTasksEnded)
-        }
+        scheduler.run(isTasksEnded)
 
         terminationDelay()
-    }
-
-    // sleep value must be more than execution time of last executed task
-    private fun terminationDelay() {
-        logService.systemTerminationDelay()
-        Thread.sleep(1000)
     }
 
     fun decreaseSuspendedTasksTimeAndMoveReadyTasksToQueue() {
@@ -60,5 +52,11 @@ class System {
     fun addTask(task: Task) {
         suspendedTasks = suspendedTasks + listOf(task)
         logService.systemInit(suspendedTasks.size)
+    }
+
+    // sleep value must be more than execution time of last executed task
+    private fun terminationDelay() {
+        logService.systemTerminationDelay()
+        Thread.sleep(1000)
     }
 }

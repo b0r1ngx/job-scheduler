@@ -1,3 +1,4 @@
+import task.ExtendedTask
 import task.Task
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -10,10 +11,19 @@ class Processor(
     var isFree = true
         private set
 
-    fun submit(task: Task, additionalInstructionsOnTermination: List<() -> Unit>) {
+    fun submit(task: Task, onWaitEvent: () -> Unit, additionalInstructionsOnTermination: List<() -> Unit>) {
         logService.processorStartOfTaskExecution(task)
         isFree = false
+
         task.setPostRunAction(additionalInstructionsOnTermination)
+        if (task is ExtendedTask) {
+            task.waitAction = {
+                onWaitEvent()
+                isFree = true
+                // TODO: add log for waiting action
+            }
+        }
+
         thread.submit(task)
     }
 

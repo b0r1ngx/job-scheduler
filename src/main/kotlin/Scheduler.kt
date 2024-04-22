@@ -1,18 +1,55 @@
+import task.ExtendedTask
 import task.Task
+import java.util.Stack
 
 class Scheduler(
     private val queue: Queue,
     private val processor: Processor,
     private val logService: LogService,
 ) {
+
     private var currentExecutingTask: Task? = null
+
+    private val waitingTasks = Stack<ExtendedTask>()
+    private val waitedTasks = Stack<ExtendedTask>()
+
+    private val onWaitEvent = {
+        waitingTasks.push(currentExecutingTask as ExtendedTask?)
+        currentExecutingTask?.let { logService.processorWaitingAtTask(it) }
+
+        if (queue.size == 0) {
+            val chosenTask = waitingTasks.pop()
+            chosenTask.release()
+            occupyProcessorBy(chosenTask)
+            logService.processorContinueExecutionOfWaitedTask(chosenTask)
+        }
+    }
+
+    val isThereWaitingTasks = { waitingTasks.isNotEmpty() || waitedTasks.isNotEmpty() }
 
     fun run(isTasksEnded: () -> Boolean) {
         while (isTasksEnded()) {
-            if (processor.isFree && queue.size > 0) {
-                val chosenTask = queue.pop()
-                logService.schedulerCurrentChoice(chosenTask)
-                occupyProcessorBy(task = chosenTask)
+            if (processor.isFree) {
+                var chosenTask: Task? = null
+
+                when {
+                    waitedTasks.isNotEmpty() -> {
+                        chosenTask = waitedTasks.pop()
+                        logService.schedulerCurrentChoiceFromWaitingStack(chosenTask)
+                    }
+                    queue.size != 0 -> {
+                        chosenTask = queue.pop()
+                        if (waitingTasks.isNotEmpty()) {
+                            val waitedTask = waitingTasks.pop()
+                            waitedTask.release()
+                            waitedTasks.push(waitedTask)
+                            logService.schedulerMarkTaskWaited(waitedTask)
+                        }
+                        logService.schedulerCurrentChoiceFromQueue(chosenTask)
+                    }
+                }
+
+                chosenTask?.let { occupyProcessorBy(it) }
             }
 
             val (isHigherTaskPriorityExists, higherTaskPriority) =
@@ -28,12 +65,15 @@ class Scheduler(
             }
             occupyProcessorBy(task = higherTaskPriority!!)
         }
+
+        logService.schedulerTerminated()
     }
 
     private fun occupyProcessorBy(task: Task) {
         currentExecutingTask = task
         processor.submit(
             task = task,
+            onWaitEvent = onWaitEvent,
             additionalInstructionsOnTermination = listOf { currentExecutingTask = null }
         )
     }
