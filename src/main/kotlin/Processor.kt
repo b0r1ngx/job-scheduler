@@ -12,15 +12,8 @@ class Processor(
 
     fun submit(task: Task) {
         logService.processorStartOfTaskExecution(task)
-
         isFree = false
-
-        task.postRunAction = {
-            onTaskTerminated(task)
-            isFree = true
-            logService.processorFinishOfTaskExecution(task)
-        }
-
+        task.setPostRunAction()
         thread.submit(task)
     }
 
@@ -32,5 +25,13 @@ class Processor(
         isFree = true
 
         logService.processorThreadInitialization()
+    }
+
+    private fun Task.setPostRunAction() {
+        postRunAction = {
+            onTaskTerminated(this)
+            isFree = true
+            logService.processorFinishOfTaskExecution(this)
+        }
     }
 }
