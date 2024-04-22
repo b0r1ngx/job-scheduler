@@ -16,8 +16,6 @@ class System {
 
     private val thread: ExecutorService = Executors.newSingleThreadExecutor()
 
-    // TODO: We need to understand where to fill this list, that we compare in tests!
-
     val isTasksEnded = { suspendedTasks.isNotEmpty() || queue.size != 0 }
 
     fun run() {
