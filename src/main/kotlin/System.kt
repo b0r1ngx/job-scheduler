@@ -42,14 +42,14 @@ class System {
 
     val isTasksEnded = { suspendedTasks.isNotEmpty() || queue.size != 0 || scheduler.isThereWaitingTasks() }
 
+
     fun decreaseSuspendedTasksTimeAndMoveReadyTasksToQueue() {
         suspendedTasks.forEach { task ->
             task.decreaseSuspendingTime()
             if (task.state == State.READY) {
-                queue.add(task).also {
-                    suspendedTasks = suspendedTasks.filter { x -> x != task }
-                    logService.systemActivatedTask(task, suspendedTasks.size)
-                }
+                logService.systemActivatedTask(task, suspendedTasks.size - 1)
+                queue.add(task)
+                suspendedTasks = suspendedTasks.filter { x -> x != task }
             }
         }
     }

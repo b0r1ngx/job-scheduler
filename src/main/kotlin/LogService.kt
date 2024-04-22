@@ -36,7 +36,7 @@ class LogService {
         println(
             String.format("TIME" +
                 "%-12sTASKS INFO" +
-                "%-${entryLength+intervalLength-10}sACTIVATION THREAD" +
+                "%-${entryLength+intervalLength-10}sSYSTEM THREAD" +
                 "%-${entryLength+intervalLength-13}sSCHEDULER THREAD" +
                 "%-${entryLength+intervalLength-16}sPROCESSOR THREAD", " ", " ", " ", " "
             )
@@ -68,6 +68,14 @@ class LogService {
         println(
             String.format("${getCurrentTime()}%-${systemInterval}s${("${Tags.SYSTEM}: " +
                     "was terminated").padEnd(entryLength)}", " "
+            )
+        )
+    }
+
+    fun systemTerminationDelay() {
+        println(
+            String.format("${getCurrentTime()}%-${systemInterval}s${("${Tags.SYSTEM}: " +
+                    "suspendedTasks.isEmpty() && queue.size < 1 , await termination delay").padEnd(entryLength)}", " "
             )
         )
     }
@@ -131,7 +139,7 @@ class LogService {
     fun processorStartOfTaskExecution(task: Task) {
         println(
             String.format("${getCurrentTime()}%-${processorInterval}s${("${Tags.PROCESSOR}: " +
-                    "start of ${getTaskShortInfo(task)} execution").padEnd(intervalLength)}", " "
+                    "execute ${getTaskShortInfo(task)}").padEnd(intervalLength)}", " "
             )
         )
     }
