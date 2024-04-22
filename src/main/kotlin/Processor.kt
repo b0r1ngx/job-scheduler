@@ -13,14 +13,10 @@ class Processor(
 
     fun submit(task: Task, onWaitEvent: () -> Unit) {
         logService.processorStartOfTaskExecution(task)
-
+        
         isFree = false
-
-        task.postRunAction = {
-            onTaskTerminated(task)
-            isFree = true
-            logService.processorFinishOfTaskExecution(task)
-        }
+        task.setPostRunAction()
+        
         if (task is ExtendedTask) {
             task.waitAction = {
                 onWaitEvent()
@@ -40,5 +36,13 @@ class Processor(
         isFree = true
 
         logService.processorThreadInitialization()
+    }
+
+    private fun Task.setPostRunAction() {
+        postRunAction = {
+            onTaskTerminated(this)
+            isFree = true
+            logService.processorFinishOfTaskExecution(this)
+        }
     }
 }
