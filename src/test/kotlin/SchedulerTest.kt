@@ -84,8 +84,8 @@ internal class SchedulerTest {
     @Test
     fun START_various_tasks_THEN_system_executes_them_in_correct_order_medium_case() {
         val expectedTerminationOrder = listOf<Task>(
-            BasicTask(name = "4", priority = Priority.CRITICAL, suspendingTime = 80), // 80
-            BasicTask(name = "3", priority = Priority.HIGH, suspendingTime = 60), // 60
+            BasicTask(name = "4", priority = Priority.CRITICAL, suspendingTime = 80),
+            BasicTask(name = "3", priority = Priority.HIGH, suspendingTime = 60),
             BasicTask(name = "2", priority = Priority.MEDIUM, suspendingTime = 40),
             BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 20),
         )
@@ -96,10 +96,10 @@ internal class SchedulerTest {
     @Test
     fun START_various_tasks_THEN_system_executes_them_in_correct_order_medium_case_longer_sus_time() {
         val expectedTerminationOrder = listOf<Task>(
-            BasicTask(name = "4", priority = Priority.CRITICAL, suspendingTime = 800), // 80
-            BasicTask(name = "3", priority = Priority.HIGH, suspendingTime = 600), // 60
-            BasicTask(name = "2", priority = Priority.MEDIUM, suspendingTime = 400),
             BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 200),
+            BasicTask(name = "2", priority = Priority.MEDIUM, suspendingTime = 400),
+            BasicTask(name = "3", priority = Priority.HIGH, suspendingTime = 600),
+            BasicTask(name = "4", priority = Priority.CRITICAL, suspendingTime = 800),
         )
         run(initialTasks = expectedTerminationOrder)
         assertEquals(expected = expectedTerminationOrder, actual = system.terminatedTasks)
