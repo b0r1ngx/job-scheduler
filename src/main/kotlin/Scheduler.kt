@@ -13,6 +13,18 @@ class Scheduler(
     private val waitingTasks = Stack<ExtendedTask>()
     private val waitedTasks = Stack<ExtendedTask>()
 
+    private val onWaitEvent = {
+        waitingTasks.push(currentExecutingTask as ExtendedTask?)
+        currentExecutingTask?.let { logService.processorWaitingAtTask(it) }
+
+        if (queue.size == 0) {
+            val chosenTask = waitingTasks.pop()
+            chosenTask.release()
+            occupyProcessorBy(chosenTask)
+            logService.processorContinueExecutionOfWaitedTask(chosenTask)
+        }
+    }
+
     val isThereWaitingTasks = { waitingTasks.isNotEmpty() || waitedTasks.isNotEmpty() }
 
     fun run(isTasksEnded: () -> Boolean) {
@@ -64,17 +76,5 @@ class Scheduler(
             onWaitEvent = onWaitEvent,
             additionalInstructionsOnTermination = listOf { currentExecutingTask = null }
         )
-    }
-
-    private val onWaitEvent = {
-        waitingTasks.push(currentExecutingTask as ExtendedTask?)
-        currentExecutingTask?.let { logService.processorWaitingAtTask(it) }
-
-        if (queue.size == 0) {
-            val chosenTask = waitingTasks.pop()
-            chosenTask.release()
-            occupyProcessorBy(chosenTask)
-            logService.processorContinueExecutionOfWaitedTask(chosenTask)
-        }
     }
 }
