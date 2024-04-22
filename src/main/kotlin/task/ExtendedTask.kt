@@ -18,11 +18,11 @@ class ExtendedTask(
         if (untilWaitTime > 0) {
             try {
                 Thread.sleep(untilWaitTime)
-                await()
             } catch (e: InterruptedException) {
                 logService.processorThreadInterruption()
                 return
             }
+            await()
             waitAction?.invoke()
         } else {
             try {
