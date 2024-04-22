@@ -46,7 +46,6 @@ class Processor(
         waitAction = {
             onWaitEvent()
             isFree = true
-            // TODO: add log for waiting action
         }
     }
 }
