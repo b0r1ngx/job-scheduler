@@ -3,7 +3,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class Processor(
-    private val onTermination: (task: Task) -> Unit,
+    private val onTaskTermination: (task: Task) -> Unit,
     private val logService: LogService,
 ) {
     private var thread: ExecutorService = Executors.newSingleThreadExecutor()
@@ -32,7 +32,7 @@ class Processor(
             additionalInstructionsOnTaskTerminated.forEach {
                 it.invoke()
             }
-            onTermination(this)
+            onTaskTermination(this)
             isFree = true
             logService.processorFinishOfTaskExecution(this)
         }
