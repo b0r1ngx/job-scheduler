@@ -1,6 +1,6 @@
 import task.ExtendedTask
 import task.Task
-import java.util.*
+import java.util.Stack
 
 class Scheduler(
     private val queue: Queue,
