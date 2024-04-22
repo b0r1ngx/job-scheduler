@@ -6,7 +6,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-// TODO: Rename it to SystemTest.kt
 @Suppress("TestFunctionName")
 internal class SystemTest {
     private val system = System()
