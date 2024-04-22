@@ -50,48 +50,56 @@ internal class SchedulerTest {
 
     @Test
     fun START_two_same_priority_tasks_THEN_system_execute_them_in_correct_order() {
-        val expectedTerminationOrder = listOf<Task>(BasicTask(), BasicTask())
-        run(initialTasks = expectedTerminationOrder)
-        assertEquals(expected = expectedTerminationOrder, actual = system.terminatedTasks)
+        val input = listOf<Task>(BasicTask(), BasicTask())
+        run(initialTasks = input)
+        assertEquals(expected = input, actual = system.terminatedTasks)
     }
 
     @Test
-    fun WHEN_different_priority_tasks_queued_THEN_correct_order_of_execution_happened() {
-        // TODO: Test for various suspendedTime, to proof that it matters when suspendedTime is various
-        val firstTask = BasicTask(Priority.CRITICAL, "1")
-        val secondTask = BasicTask(Priority.HIGH, "2")
-        val thirdTask = BasicTask(Priority.HIGH, "3")
-        val fourthTask = BasicTask(Priority.HIGH, "4")
-        val fifthTask = BasicTask(Priority.LOW, "5")
-
-        val expectedTerminationOrder = listOf<Task>(
-            firstTask, thirdTask, fourthTask, secondTask, fifthTask
+    fun WHEN_different_priority_tasks_queued_THEN_system_execute_them_in_correct_order() {
+        val input = listOf<Task>(
+            BasicTask(Priority.CRITICAL, "1"),
+            BasicTask(Priority.HIGH, "2"),
+            BasicTask(Priority.HIGH, "3"),
+            BasicTask(Priority.HIGH, "4"),
+            BasicTask(Priority.LOW, "5"),
         )
-        run(initialTasks = expectedTerminationOrder)
-        assertEquals(expected = expectedTerminationOrder, actual = system.terminatedTasks)
+        run(initialTasks = input)
+        assertEquals(expected = input, actual = system.terminatedTasks)
+    }
+
+    @Test
+    fun START_various_tasks_THEN_system_executes_them_in_correct_order() {
+        val input = listOf<Task>(
+            BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 200),
+            BasicTask(name = "2", priority = Priority.MEDIUM, suspendingTime = 400),
+            BasicTask(name = "3", priority = Priority.HIGH, suspendingTime = 600),
+            BasicTask(name = "4", priority = Priority.CRITICAL, suspendingTime = 800),
+        )
+        run(initialTasks = input)
+        assertEquals(expected = input, actual = system.terminatedTasks)
     }
 
     @Test
     fun WHEN_higher_priority_task_queued_THEN_current_executed_task_goes_to_queue() {
-        val expectedTerminationOrder = listOf<Task>(
+        val input = listOf<Task>(
+            BasicTask(Priority.HIGH, "1", suspendingTime = 10),
             BasicTask(Priority.CRITICAL, "2", suspendingTime = 50),
-            BasicTask(Priority.HIGH, "1", suspendingTime = 10)
         )
-        run(initialTasks = expectedTerminationOrder)
-        assertEquals(expected = expectedTerminationOrder, actual = system.terminatedTasks)
+        run(initialTasks = input)
+        assertEquals(expected = input.reversed(), actual = system.terminatedTasks)
     }
-
 
     @Test
     fun START_various_tasks_THEN_system_executes_them_in_correct_order_medium_case() {
-        val expectedTerminationOrder = listOf<Task>(
-            BasicTask(name = "4", priority = Priority.CRITICAL, suspendingTime = 80), // 80
-            BasicTask(name = "3", priority = Priority.HIGH, suspendingTime = 60), // 60
-            BasicTask(name = "2", priority = Priority.MEDIUM, suspendingTime = 40),
+        val input = listOf<Task>(
             BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 20),
+            BasicTask(name = "2", priority = Priority.MEDIUM, suspendingTime = 40),
+            BasicTask(name = "3", priority = Priority.HIGH, suspendingTime = 60),
+            BasicTask(name = "4", priority = Priority.CRITICAL, suspendingTime = 80),
         )
-        run(initialTasks = expectedTerminationOrder)
-        assertEquals(expected = expectedTerminationOrder, actual = system.terminatedTasks)
+        run(initialTasks = input)
+        assertEquals(expected = input.reversed(), actual = system.terminatedTasks)
     }
 
     @Test

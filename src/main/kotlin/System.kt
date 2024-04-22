@@ -9,22 +9,14 @@ class System {
         private set
 
     private val logService = LogService()
-    val queue = Queue(
-        logService = logService
-    )
-    private val processor = Processor(
-        onTaskTerminated = terminatedTasks::add,
-        logService = logService
-    )
-    private val scheduler = Scheduler(
-        queue = queue,
-        processor = processor,
-        logService = logService
-    )
+
+    val queue = Queue(logService = logService)
+    private val processor = Processor(onTaskTermination = terminatedTasks::add, logService = logService)
+    private val scheduler = Scheduler(queue = queue, processor = processor, logService = logService)
 
     private val thread: ExecutorService = Executors.newSingleThreadExecutor()
 
-    // TODO: We need to understand where to fill this list, that we compare in tests!
+    val isTasksEnded = { suspendedTasks.isNotEmpty() || queue.size != 0 || scheduler.isThereWaitingTasks() }
 
     fun run() {
         thread.submit {
@@ -40,16 +32,13 @@ class System {
         terminationDelay()
     }
 
-    val isTasksEnded = { suspendedTasks.isNotEmpty() || queue.size != 0 || scheduler.isThereWaitingTasks() }
-
     fun decreaseSuspendedTasksTimeAndMoveReadyTasksToQueue() {
         suspendedTasks.forEach { task ->
             task.decreaseSuspendingTime()
             if (task.state == State.READY) {
-                queue.add(task).also {
-                    suspendedTasks = suspendedTasks.filter { x -> x != task }
-                    logService.systemActivatedTask(task, suspendedTasks.size)
-                }
+                logService.systemActivatedTask(task, suspendedTasks.size - 1)
+                queue.add(task)
+                suspendedTasks = suspendedTasks.filter { x -> x != task }
             }
         }
     }
@@ -66,5 +55,8 @@ class System {
     }
 
     // sleep value must be more than execution time of last executed task
-    private fun terminationDelay() = Thread.sleep(1000)
+    private fun terminationDelay() {
+        logService.systemTerminationDelay()
+        Thread.sleep(1000)
+    }
 }

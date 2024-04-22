@@ -11,7 +11,7 @@ open class BasicTask(
 ) : Task {
 
     override var state: State = State.SUSPENDED
-    override var postRunAction: (() -> Unit)? = null
+    override var onTermination: (() -> Unit)? = null
 
     val logService = LogService()
 
@@ -26,7 +26,7 @@ open class BasicTask(
         }
 
         terminate()
-        postRunAction?.invoke()
+        onTermination?.invoke()
     }
 
     override fun decreaseSuspendingTime() {

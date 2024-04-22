@@ -1,6 +1,5 @@
 package task
 
-import LogService
 import java.util.UUID
 
 class ExtendedTask(
@@ -33,7 +32,7 @@ class ExtendedTask(
                 return
             }
             terminate()
-            postRunAction?.invoke()
+            onTermination?.invoke()
         }
     }
 

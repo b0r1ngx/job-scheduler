@@ -59,7 +59,11 @@ class Scheduler(
 
     private fun occupyProcessorBy(task: Task) {
         currentExecutingTask = task
-        processor.submit(task, onWaitEvent)
+        processor.submit(
+            task = task,
+            onWaitEvent = onWaitEvent,
+            additionalInstructionsOnTermination = listOf { currentExecutingTask = null }
+        )
     }
 
     private val onWaitEvent = {
