@@ -108,16 +108,25 @@ internal class SchedulerTest {
 
     @Test
     fun START_extended_task() {
-        val input = listOf<Task>(
-            BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 100),
-            ExtendedTask(name = "2", priority = Priority.LOW, suspendingTime = 200, untilWaitTime = 50),
-            BasicTask(name = "3", priority = Priority.LOW, suspendingTime = 400)
-        )
-        val expectedTerminationOrder = listOf<Task>(
-            BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 0),
-            BasicTask(name = "3", priority = Priority.LOW, suspendingTime = 0),
-            ExtendedTask(name = "2", priority = Priority.LOW, suspendingTime = 0)
-        )
+        val task1 = BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 100)
+        val task2 = ExtendedTask(name = "2", priority = Priority.LOW, suspendingTime = 200, untilWaitTime = 50)
+        val task3 = BasicTask(name = "3", priority = Priority.LOW, suspendingTime = 400)
+
+        val input = listOf<Task>(task1, task2, task3)
+        val expectedTerminationOrder = listOf<Task>(task1, task3, task2)
+
+        run(initialTasks = input)
+        assertEquals(expected = expectedTerminationOrder, actual = system.terminatedTasks)
+    }
+
+    @Test
+    fun START_extended_task_2() {
+        val task1 = BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 100)
+        val task2 = ExtendedTask(name = "2", priority = Priority.LOW, suspendingTime = 200, untilWaitTime = 50)
+
+        val input = listOf<Task>(task1, task2)
+        val expectedTerminationOrder = listOf<Task>(task1, task2)
+
         run(initialTasks = input)
         assertEquals(expected = expectedTerminationOrder, actual = system.terminatedTasks)
     }

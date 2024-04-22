@@ -67,7 +67,7 @@ class LogService {
 
     fun systemTermination() {
         println(
-            String.format("${getCurrentTime()}%-${systemInterval}s${("${Tags.QUEUE}: " +
+            String.format("${getCurrentTime()}%-${systemInterval}s${("${Tags.SYSTEM}: " +
                     "was terminated").padEnd(entryLength)}", " "
             )
         )

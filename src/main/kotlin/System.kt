@@ -1,17 +1,12 @@
-import task.ExtendedTask
 import task.State
 import task.Task
-import java.util.Stack
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class System {
+    val terminatedTasks = mutableListOf<Task>()
     var suspendedTasks = listOf<Task>()
         private set
-
-    val terminatedTasks = mutableListOf<Task>()
-
-    val waitingTasks = Stack<Pair<ExtendedTask, Boolean>>()
 
     private val logService = LogService()
     val queue = Queue(
@@ -19,23 +14,17 @@ class System {
     )
     private val processor = Processor(
         onTaskTerminated = terminatedTasks::add,
-        onTaskWaiting = waitingTasks::push,
         logService = logService
     )
     private val scheduler = Scheduler(
         queue = queue,
         processor = processor,
-        logService = logService,
-        waitingTasks = waitingTasks,
-        popWaitingTask = waitingTasks::pop,
-        pushWaitedTask = waitingTasks::push
+        logService = logService
     )
 
     private val thread: ExecutorService = Executors.newSingleThreadExecutor()
 
     // TODO: We need to understand where to fill this list, that we compare in tests!
-
-    val isTasksEnded = { suspendedTasks.isNotEmpty() || waitingTasks.isNotEmpty() || queue.size != 0 }
 
     fun run() {
         thread.submit {
@@ -46,12 +35,12 @@ class System {
             logService.systemTermination()
         }
 
-        while (isTasksEnded()) {
-            scheduler.run(isTasksEnded)
-        }
+        scheduler.run(isTasksEnded)
 
         terminationDelay()
     }
+
+    val isTasksEnded = { suspendedTasks.isNotEmpty() || queue.size != 0 || scheduler.isThereWaitingTasks() }
 
     // sleep value must be more than execution time of last executed task
     private fun terminationDelay() = Thread.sleep(1000)

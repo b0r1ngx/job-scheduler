@@ -6,37 +6,54 @@ class Scheduler(
     private val queue: Queue,
     private val processor: Processor,
     private val logService: LogService,
-    private val waitingTasks: Stack<Pair<ExtendedTask, Boolean>>,
-    private val popWaitingTask: () -> Pair<ExtendedTask, Boolean>,
-    private val pushWaitedTask: (Pair<ExtendedTask, Boolean>) -> Unit
 ) {
+
     private var currentExecutingTask: Task? = null
+
+    private val waitingTasks = Stack<ExtendedTask>()
+    private val waitedTasks = Stack<ExtendedTask>()
+
+    val isThereWaitingTasks = { waitingTasks.isNotEmpty() || waitedTasks.isNotEmpty() }
 
     fun run(isTasksEnded: () -> Boolean) {
         while (isTasksEnded()) {
             if (processor.isFree) {
                 var chosenTask: Task? = null
 
-                for (entry in waitingTasks) {
-                    if (entry.second) {
-                        chosenTask = popWaitingTask().first
-                        // TODO: log getting of waited task
-                        break
+                when {
+                    waitedTasks.isNotEmpty() -> {
+                        chosenTask = waitedTasks.pop()
+                        println("lalala")
+                        // TODO
                     }
-                }
-                if (chosenTask == null && queue.size != 0) {
-                    chosenTask = queue.pop()
-                    if (waitingTasks.isNotEmpty()) {
-                        val waitedTask = popWaitingTask().first
-                        waitedTask.release()
-                        pushWaitedTask(waitedTask to true)
-                        // TODO: log setting of wait
+                    queue.size != 0 -> {
+                        chosenTask = queue.pop()
+                        if (waitingTasks.isNotEmpty()) {
+                            val waitedTask = waitingTasks.pop()
+                            waitedTask.release()
+                            waitedTasks.push(waitedTask)
+                            // TODO
+                        }
                     }
+                    /*
+                    queue.size == 0 && waitingTasks.isNotEmpty() -> {
+                        chosenTask = waitingTasks.pop()
+                        chosenTask.release()
+                    }
+
+                     */
+                    /*
+                    waitedTasks.isEmpty() && queue.size == 0 && waitingTasks.isNotEmpty() -> {
+                        chosenTask = waitingTasks.pop()
+                        chosenTask.release()
+                        // TODO
+                    }
+
+                     */
                 }
 
-                chosenTask?.let {
-                    logService.schedulerCurrentChoice(it)
-                    occupyProcessorBy(task = it)
+                if (chosenTask != null) {
+                    occupyProcessorBy(chosenTask)
                 }
             }
 
@@ -53,10 +70,28 @@ class Scheduler(
             }
             occupyProcessorBy(task = higherTaskPriority!!)
         }
+        // TODO
     }
 
     private fun occupyProcessorBy(task: Task) {
+        logService.schedulerCurrentChoice(task)
+
         currentExecutingTask = task
-        processor.submit(task)
+        processor.submit(task, onWaitEvent)
+    }
+
+    private val onWaitEvent = {
+        waitingTasks.push(currentExecutingTask as ExtendedTask?)
+        /*
+        if (queue.size == 0) {
+            (currentExecutingTask as ExtendedTask?)?.release()
+            waitedTasks.push(currentExecutingTask as ExtendedTask?)
+        } else {
+            waitingTasks.push(currentExecutingTask as ExtendedTask?)
+        }
+
+         */
+
+        println(waitedTasks.joinToString())                          // TODO
     }
 }
