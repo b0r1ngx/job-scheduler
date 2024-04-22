@@ -60,9 +60,21 @@ internal class SchedulerTest {
         val input = listOf<Task>(
             BasicTask(Priority.CRITICAL, "1"),
             BasicTask(Priority.HIGH, "2"),
-            BasicTask(Priority.HIGH, "4"),
             BasicTask(Priority.HIGH, "3"),
+            BasicTask(Priority.HIGH, "4"),
             BasicTask(Priority.LOW, "5"),
+        )
+        run(initialTasks = input)
+        assertEquals(expected = input, actual = system.terminatedTasks)
+    }
+
+    @Test
+    fun START_various_tasks_THEN_system_executes_them_in_correct_order() {
+        val input = listOf<Task>(
+            BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 200),
+            BasicTask(name = "2", priority = Priority.MEDIUM, suspendingTime = 400),
+            BasicTask(name = "3", priority = Priority.HIGH, suspendingTime = 600),
+            BasicTask(name = "4", priority = Priority.CRITICAL, suspendingTime = 800),
         )
         run(initialTasks = input)
         assertEquals(expected = input, actual = system.terminatedTasks)
@@ -78,7 +90,6 @@ internal class SchedulerTest {
         assertEquals(expected = listOf(input[1], input[0]), actual = system.terminatedTasks)
     }
 
-
     @Test
     fun START_various_tasks_THEN_system_executes_them_in_correct_order_medium_case() {
         val expectedTerminationOrder = listOf<Task>(
@@ -91,15 +102,4 @@ internal class SchedulerTest {
         assertEquals(expected = expectedTerminationOrder, actual = system.terminatedTasks)
     }
 
-    @Test
-    fun START_various_tasks_THEN_system_executes_them_in_correct_order() {
-        val input = listOf<Task>(
-            BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 200),
-            BasicTask(name = "2", priority = Priority.MEDIUM, suspendingTime = 400),
-            BasicTask(name = "3", priority = Priority.HIGH, suspendingTime = 600),
-            BasicTask(name = "4", priority = Priority.CRITICAL, suspendingTime = 800),
-        )
-        run(initialTasks = input)
-        assertEquals(expected = input, actual = system.terminatedTasks)
-    }
 }
