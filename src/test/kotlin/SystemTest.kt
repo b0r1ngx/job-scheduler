@@ -8,7 +8,7 @@ import kotlin.test.assertTrue
 
 // TODO: Rename it to SystemTest.kt
 @Suppress("TestFunctionName")
-internal class SchedulerTest {
+internal class SystemTest {
     private val system = System()
 
     private fun run(initialTasks: List<Task>) =
@@ -39,11 +39,8 @@ internal class SchedulerTest {
     @Test
     fun WHEN_pop_tasks_it_out() {
         assertTrue(system.queue.size == 0)
-
         system.queue.add(BasicTask())
-
         assertTrue(system.queue.size != 0)
-
         system.queue.pop()
         assertTrue(system.queue.size == 0)
     }
