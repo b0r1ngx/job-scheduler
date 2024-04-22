@@ -57,14 +57,12 @@ internal class SchedulerTest {
     @Test
     fun WHEN_different_priority_tasks_queued_THEN_correct_order_of_execution_happened() {
         // TODO: Test for various suspendedTime, to proof that it matters when suspendedTime is various
-        val firstTask = BasicTask(Priority.CRITICAL, "1")
-        val secondTask = BasicTask(Priority.HIGH, "2")
-        val thirdTask = BasicTask(Priority.HIGH, "3")
-        val fourthTask = BasicTask(Priority.HIGH, "4")
-        val fifthTask = BasicTask(Priority.LOW, "5")
-
         val expectedTerminationOrder = listOf<Task>(
-            firstTask, thirdTask, fourthTask, secondTask, fifthTask
+            BasicTask(Priority.CRITICAL, "1"),
+            BasicTask(Priority.HIGH, "2"),
+            BasicTask(Priority.HIGH, "4"),
+            BasicTask(Priority.HIGH, "3"),
+            BasicTask(Priority.LOW, "5")
         )
         run(initialTasks = expectedTerminationOrder)
         assertEquals(expected = expectedTerminationOrder, actual = system.terminatedTasks)
