@@ -66,8 +66,16 @@ class LogService {
 
     fun systemTermination() {
         println(
-            String.format("${getCurrentTime()}%-${systemInterval}s${("${Tags.QUEUE}: " +
+            String.format("${getCurrentTime()}%-${systemInterval}s${("${Tags.SYSTEM}: " +
                     "was terminated").padEnd(entryLength)}", " "
+            )
+        )
+    }
+
+    fun systemTerminationDelay() {
+        println(
+            String.format("${getCurrentTime()}%-${systemInterval}s${("${Tags.SYSTEM}: " +
+                    "suspendedTasks.isEmpty() && queue.size < 1 , await termination delay").padEnd(entryLength)}", " "
             )
         )
     }

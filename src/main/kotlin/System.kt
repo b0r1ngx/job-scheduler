@@ -37,7 +37,10 @@ class System {
     }
 
     // sleep value must be more than execution time of last executed task
-    private fun terminationDelay() = Thread.sleep(1000)
+    private fun terminationDelay() {
+        logService.systemTerminationDelay()
+        Thread.sleep(1000)
+    }
 
     fun decreaseSuspendedTasksTimeAndMoveReadyTasksToQueue() {
         suspendedTasks.forEach { task ->
