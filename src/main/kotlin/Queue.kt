@@ -35,7 +35,7 @@ class Queue(private val logService: LogService) {
         if (currentTaskPriority != null) {
             queue.forEach { (priority, queue) ->
                 if (priority > currentTaskPriority && queue.isNotEmpty()) {
-                    val task = pop()
+                    val task = queue.pop()
                     logService.schedulerPoppedTaskWithHigherPriority(task)
                     return true to task
                 }
