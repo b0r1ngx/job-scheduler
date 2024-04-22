@@ -56,7 +56,6 @@ internal class SchedulerTest {
 
     @Test
     fun WHEN_different_priority_tasks_queued_THEN_system_execute_them_in_correct_order() {
-        // TODO: Test for various suspendedTime, to proof that it matters when suspendedTime is various
         val input = listOf<Task>(
             BasicTask(Priority.CRITICAL, "1"),
             BasicTask(Priority.HIGH, "2"),
@@ -87,19 +86,19 @@ internal class SchedulerTest {
             BasicTask(Priority.CRITICAL, "2", suspendingTime = 50),
         )
         run(initialTasks = input)
-        assertEquals(expected = listOf(input[1], input[0]), actual = system.terminatedTasks)
+        assertEquals(expected = input.reversed(), actual = system.terminatedTasks)
     }
 
     @Test
     fun START_various_tasks_THEN_system_executes_them_in_correct_order_medium_case() {
-        val expectedTerminationOrder = listOf<Task>(
-            BasicTask(name = "4", priority = Priority.CRITICAL, suspendingTime = 80),
-            BasicTask(name = "3", priority = Priority.HIGH, suspendingTime = 60),
-            BasicTask(name = "2", priority = Priority.MEDIUM, suspendingTime = 40),
+        val input = listOf<Task>(
             BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 20),
+            BasicTask(name = "2", priority = Priority.MEDIUM, suspendingTime = 40),
+            BasicTask(name = "3", priority = Priority.HIGH, suspendingTime = 60),
+            BasicTask(name = "4", priority = Priority.CRITICAL, suspendingTime = 80),
         )
-        run(initialTasks = expectedTerminationOrder)
-        assertEquals(expected = expectedTerminationOrder, actual = system.terminatedTasks)
+        run(initialTasks = input)
+        assertEquals(expected = input.reversed(), actual = system.terminatedTasks)
     }
 
 }
