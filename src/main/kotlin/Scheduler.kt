@@ -23,8 +23,7 @@ class Scheduler(
                 when {
                     waitedTasks.isNotEmpty() -> {
                         chosenTask = waitedTasks.pop()
-                        println("lalala")
-                        // TODO
+                        logService.schedulerCurrentChoiceFromWaitingStack(chosenTask)
                     }
                     queue.size != 0 -> {
                         chosenTask = queue.pop()
@@ -32,29 +31,13 @@ class Scheduler(
                             val waitedTask = waitingTasks.pop()
                             waitedTask.release()
                             waitedTasks.push(waitedTask)
-                            // TODO
+                            logService.schedulerMarkTaskWaited(waitedTask)
                         }
+                        logService.schedulerCurrentChoiceFromQueue(chosenTask)
                     }
-                    /*
-                    queue.size == 0 && waitingTasks.isNotEmpty() -> {
-                        chosenTask = waitingTasks.pop()
-                        chosenTask.release()
-                    }
-
-                     */
-                    /*
-                    waitedTasks.isEmpty() && queue.size == 0 && waitingTasks.isNotEmpty() -> {
-                        chosenTask = waitingTasks.pop()
-                        chosenTask.release()
-                        // TODO
-                    }
-
-                     */
                 }
 
-                if (chosenTask != null) {
-                    occupyProcessorBy(chosenTask)
-                }
+                chosenTask?.let { occupyProcessorBy(it) }
             }
 
             val (isHigherTaskPriorityExists, higherTaskPriority) =
@@ -70,28 +53,24 @@ class Scheduler(
             }
             occupyProcessorBy(task = higherTaskPriority!!)
         }
-        // TODO
+
+        logService.schedulerTerminated()
     }
 
     private fun occupyProcessorBy(task: Task) {
-        logService.schedulerCurrentChoice(task)
-
         currentExecutingTask = task
         processor.submit(task, onWaitEvent)
     }
 
     private val onWaitEvent = {
         waitingTasks.push(currentExecutingTask as ExtendedTask?)
-        /*
+        currentExecutingTask?.let { logService.processorWaitingAtTask(it) }
+
         if (queue.size == 0) {
-            (currentExecutingTask as ExtendedTask?)?.release()
-            waitedTasks.push(currentExecutingTask as ExtendedTask?)
-        } else {
-            waitingTasks.push(currentExecutingTask as ExtendedTask?)
+            val chosenTask = waitingTasks.pop()
+            chosenTask.release()
+            occupyProcessorBy(chosenTask)
+            logService.processorContinueExecutionOfWaitedTask(chosenTask)
         }
-
-         */
-
-        println(waitedTasks.joinToString())                          // TODO
     }
 }

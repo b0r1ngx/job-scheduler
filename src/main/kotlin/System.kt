@@ -42,9 +42,6 @@ class System {
 
     val isTasksEnded = { suspendedTasks.isNotEmpty() || queue.size != 0 || scheduler.isThereWaitingTasks() }
 
-    // sleep value must be more than execution time of last executed task
-    private fun terminationDelay() = Thread.sleep(1000)
-
     fun decreaseSuspendedTasksTimeAndMoveReadyTasksToQueue() {
         suspendedTasks.forEach { task ->
             task.decreaseSuspendingTime()
@@ -67,4 +64,7 @@ class System {
         suspendedTasks = suspendedTasks + listOf(task)
         logService.systemInit(suspendedTasks.size)
     }
+
+    // sleep value must be more than execution time of last executed task
+    private fun terminationDelay() = Thread.sleep(1000)
 }

@@ -1,4 +1,3 @@
-import task.BasicTask
 import task.ExtendedTask
 import task.State
 import task.Task
@@ -97,10 +96,34 @@ class LogService {
         )
     }
 
-    fun schedulerCurrentChoice(task: Task) {
+    fun schedulerCurrentChoiceFromQueue(task: Task) {
         println(
             String.format("${getCurrentTime()}%-${schedulerInterval}s${("${Tags.SCHEDULER}: " +
-                    "current choice is ${getTaskShortInfo(task)}").padEnd(intervalLength)}", " "
+                    "current choice from queue is ${getTaskShortInfo(task)}").padEnd(intervalLength)}", " "
+            )
+        )
+    }
+
+    fun schedulerCurrentChoiceFromWaitingStack(task: Task) {
+        println(
+            String.format("${getCurrentTime()}%-${schedulerInterval}s${("${Tags.SCHEDULER}: " +
+                    "current choice from waiting stack is ${getTaskShortInfo(task)}").padEnd(intervalLength)}", " "
+            )
+        )
+    }
+
+    fun schedulerMarkTaskWaited(task: Task) {
+        println(
+            String.format("${getCurrentTime()}%-${schedulerInterval}s${("${Tags.SCHEDULER}: " +
+                    "task waited - ${getTaskShortInfo(task)}").padEnd(intervalLength)}", " "
+            )
+        )
+    }
+
+    fun schedulerTerminated() {
+        println(
+            String.format("${getCurrentTime()}%-${schedulerInterval}s${("${Tags.SCHEDULER}: " +
+                    "was terminated").padEnd(intervalLength)}", " "
             )
         )
     }
@@ -153,6 +176,21 @@ class LogService {
         )
     }
 
+    fun processorWaitingAtTask(task: Task) {
+        println(
+            String.format("${getCurrentTime()}%-${processorInterval}s${("${Tags.PROCESSOR}: " +
+                    "waiting at ${getTaskShortInfo(task)}").padEnd(intervalLength)}", " "
+            )
+        )
+    }
+
+    fun processorContinueExecutionOfWaitedTask(task: Task) {
+        println(
+            String.format("${getCurrentTime()}%-${processorInterval}s${("${Tags.PROCESSOR}: " +
+                    "continue execution of ${getTaskShortInfo(task)}").padEnd(intervalLength)}", " "
+            )
+        )
+    }
 
     private fun getCurrentTime(): String {
         val date = Date()

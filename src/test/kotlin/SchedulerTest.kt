@@ -107,10 +107,23 @@ internal class SchedulerTest {
     }
 
     @Test
-    fun START_extended_task() {
+    fun START_extended_task_dont_change_the_order() {
         val task1 = BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 100)
         val task2 = ExtendedTask(name = "2", priority = Priority.LOW, suspendingTime = 200, untilWaitTime = 50)
         val task3 = BasicTask(name = "3", priority = Priority.LOW, suspendingTime = 400)
+
+        val input = listOf<Task>(task1, task2, task3)
+        val expectedTerminationOrder = listOf<Task>(task1, task2, task3)
+
+        run(initialTasks = input)
+        assertEquals(expected = expectedTerminationOrder, actual = system.terminatedTasks)
+    }
+
+    @Test
+    fun START_extended_task_change_the_order() {
+        val task1 = BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 100)
+        val task2 = ExtendedTask(name = "2", priority = Priority.LOW, suspendingTime = 200, untilWaitTime = 50)
+        val task3 = BasicTask(name = "3", priority = Priority.LOW, suspendingTime = 210)
 
         val input = listOf<Task>(task1, task2, task3)
         val expectedTerminationOrder = listOf<Task>(task1, task3, task2)
@@ -120,7 +133,7 @@ internal class SchedulerTest {
     }
 
     @Test
-    fun START_extended_task_2() {
+    fun START_extended_task_in_the_end_of_the_order() {
         val task1 = BasicTask(name = "1", priority = Priority.LOW, suspendingTime = 100)
         val task2 = ExtendedTask(name = "2", priority = Priority.LOW, suspendingTime = 200, untilWaitTime = 50)
 
