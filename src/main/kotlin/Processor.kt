@@ -15,14 +15,8 @@ class Processor(
         logService.processorStartOfTaskExecution(task)
         isFree = false
 
-        task.setPostRunAction(additionalInstructionsOnTermination)
-        if (task is ExtendedTask) {
-            task.waitAction = {
-                onWaitEvent()
-                isFree = true
-                // TODO: add log for waiting action
-            }
-        }
+        task.setOnTerminationActions(additionalInstructionsOnTermination)
+        (task as? ExtendedTask)?.setOnWaitAction(onWaitEvent)
 
         thread.submit(task)
     }
@@ -37,7 +31,7 @@ class Processor(
         logService.processorThreadInitialization()
     }
 
-    private fun Task.setPostRunAction(additionalInstructionsOnTaskTerminated: List<() -> Unit>) {
+    private fun Task.setOnTerminationActions(additionalInstructionsOnTaskTerminated: List<() -> Unit>) {
         onTermination = {
             additionalInstructionsOnTaskTerminated.forEach {
                 it.invoke()
@@ -45,6 +39,14 @@ class Processor(
             onTaskTermination(this)
             isFree = true
             logService.processorFinishOfTaskExecution(this)
+        }
+    }
+
+    private fun ExtendedTask.setOnWaitAction(onWaitEvent: () -> Unit) {
+        waitAction = {
+            onWaitEvent()
+            isFree = true
+            // TODO: add log for waiting action
         }
     }
 }
