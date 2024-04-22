@@ -11,7 +11,7 @@ class System {
 
     private val logService = LogService()
     val queue = Queue(logService = logService)
-    private val processor = Processor(onTaskTerminated = terminatedTasks::add, logService = logService)
+    private val processor = Processor(onTermination = terminatedTasks::add, logService = logService)
     private val scheduler = Scheduler(queue = queue, processor = processor, logService = logService)
 
     private val thread: ExecutorService = Executors.newSingleThreadExecutor()

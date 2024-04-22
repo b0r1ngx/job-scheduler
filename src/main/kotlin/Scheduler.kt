@@ -32,6 +32,9 @@ class Scheduler(
 
     private fun occupyProcessorBy(task: Task) {
         currentExecutingTask = task
-        processor.submit(task)
+        processor.submit(
+            task = task,
+            additionalInstructionsOnTermination = listOf { currentExecutingTask = null }
+        )
     }
 }

@@ -3,17 +3,17 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class Processor(
-    private val onTaskTerminated: (task: Task) -> Unit,
+    private val onTermination: (task: Task) -> Unit,
     private val logService: LogService,
 ) {
     private var thread: ExecutorService = Executors.newSingleThreadExecutor()
     var isFree = true
         private set
 
-    fun submit(task: Task) {
+    fun submit(task: Task, additionalInstructionsOnTermination: List<() -> Unit>) {
         logService.processorStartOfTaskExecution(task)
         isFree = false
-        task.setPostRunAction()
+        task.setPostRunAction(additionalInstructionsOnTermination)
         thread.submit(task)
     }
 
@@ -27,9 +27,12 @@ class Processor(
         logService.processorThreadInitialization()
     }
 
-    private fun Task.setPostRunAction() {
-        postRunAction = {
-            onTaskTerminated(this)
+    private fun Task.setPostRunAction(additionalInstructionsOnTaskTerminated: List<() -> Unit>) {
+        onTermination = {
+            additionalInstructionsOnTaskTerminated.forEach {
+                it.invoke()
+            }
+            onTermination(this)
             isFree = true
             logService.processorFinishOfTaskExecution(this)
         }
