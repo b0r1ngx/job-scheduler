@@ -4,7 +4,9 @@ import java.util.LinkedList
 import java.util.NoSuchElementException
 
 class Queue(private val logService: LogService) {
-    private val queue: Map<Priority, LinkedList<Task>> = buildMap { Priority.entries.forEach { put(it, LinkedList()) } }
+    private val queue: Map<Priority, LinkedList<Task>> = buildMap {
+        Priority.entries.reversed().forEach { put(it, LinkedList()) }
+    }
 
     var size: Int = 0
         private set
@@ -35,7 +37,7 @@ class Queue(private val logService: LogService) {
         if (currentTaskPriority != null) {
             queue.forEach { (priority, queue) ->
                 if (priority > currentTaskPriority && queue.isNotEmpty()) {
-                    val task = queue.pop()
+                    val task = pop()
                     logService.schedulerPoppedTaskWithHigherPriority(task)
                     return true to task
                 }
