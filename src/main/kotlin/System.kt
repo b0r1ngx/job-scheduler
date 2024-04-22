@@ -46,7 +46,7 @@ class System {
         suspendedTasks.forEach { task ->
             task.decreaseSuspendingTime()
             if (task.state == State.READY) {
-                logService.systemActivatedTask(task, suspendedTasks.size)
+                logService.systemActivatedTask(task, suspendedTasks.size - 1)
                 queue.add(task)
                 suspendedTasks = suspendedTasks.filter { x -> x != task }
             }
